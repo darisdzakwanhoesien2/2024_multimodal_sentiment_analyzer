@@ -1,0 +1,12 @@
+streamlit
+yt_dlp
+openai>=1.10.0
+pydub
+pandas
+numpy
+nltk
+requests
+tqdm
+matplotlib
+seaborn
+python-dotenv

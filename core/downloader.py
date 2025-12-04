@@ -3,17 +3,22 @@ import os
 import re
 import json
 
+
 def folder_name_from_title(title: str):
     return re.sub(r'\W+', '_', title.lower())
+
 
 def get_video_info(url: str):
     try:
         with yt_dlp.YoutubeDL() as ydl:
-            return ydl.extract_info(url, download=False)
+            info = ydl.extract_info(url, download=False)
+            return info
     except Exception:
         return None
 
+
 def download_video(url: str, base_dir="public/packages"):
+    """Download a YouTube video and return folder + video path."""
     info = get_video_info(url)
     if not info:
         return None, None
@@ -23,18 +28,19 @@ def download_video(url: str, base_dir="public/packages"):
     folder_path = os.path.join(base_dir, folder)
     os.makedirs(folder_path, exist_ok=True)
 
-    # Save info
+    # Save metadata
     with open(os.path.join(folder_path, "video_info.json"), "w") as f:
         json.dump(info, f, indent=4)
 
-    outtmpl = os.path.join(folder_path, "video.mp4")
+    # Set output file path
+    video_output = os.path.join(folder_path, "video.mp4")
 
-    opts = {"outtmpl": outtmpl, "format": "mp4"}
+    ydl_opts = {"outtmpl": video_output, "format": "mp4"}
 
     try:
-        with yt_dlp.YoutubeDL(opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
     except Exception:
         return folder_path, None
 
-    return folder_path, outtmpl
+    return folder_path, video_output
