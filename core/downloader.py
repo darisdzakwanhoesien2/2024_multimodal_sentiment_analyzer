@@ -4,7 +4,7 @@ import re
 import json
 
 
-def folder_name_from_title(title: str):
+def folder_name_from_title(title: str) -> str:
     return re.sub(r'\W+', '_', title.lower())
 
 
@@ -13,12 +13,13 @@ def get_video_info(url: str):
         with yt_dlp.YoutubeDL() as ydl:
             info = ydl.extract_info(url, download=False)
             return info
-    except Exception:
+    except Exception as e:
+        print("yt-dlp info error:", e)
         return None
 
 
 def download_video(url: str, base_dir="public/packages"):
-    """Download a YouTube video and return folder + video path."""
+    """Download a YouTube video and return folder path and video file path."""
     info = get_video_info(url)
     if not info:
         return None, None
@@ -29,18 +30,20 @@ def download_video(url: str, base_dir="public/packages"):
     os.makedirs(folder_path, exist_ok=True)
 
     # Save metadata
-    with open(os.path.join(folder_path, "video_info.json"), "w") as f:
-        json.dump(info, f, indent=4)
+    try:
+        with open(os.path.join(folder_path, "video_info.json"), "w", encoding="utf-8") as f:
+            json.dump(info, f, indent=2, ensure_ascii=False)
+    except Exception as e:
+        print("Could not write metadata:", e)
 
-    # Set output file path
     video_output = os.path.join(folder_path, "video.mp4")
-
     ydl_opts = {"outtmpl": video_output, "format": "mp4"}
 
     try:
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
-    except Exception:
+    except Exception as e:
+        print("yt-dlp download error:", e)
         return folder_path, None
 
     return folder_path, video_output

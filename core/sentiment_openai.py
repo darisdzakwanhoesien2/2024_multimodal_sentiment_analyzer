@@ -1,44 +1,65 @@
 import json
-import numpy as np
 import time
-from tqdm import tqdm
+import os
+import numpy as np
 from openai import OpenAI
+import streamlit as st
 
-client = OpenAI()
+def _get_api_key():
+    return os.environ.get("OPENAI_API_KEY") or st.secrets.get("OPENAI_API_KEY", None)
+
+API_KEY = _get_api_key()
+if not API_KEY:
+    raise ValueError("OPENAI_API_KEY is missing. Add it to environment or Streamlit secrets.")
+
+client = OpenAI(api_key=API_KEY)
 
 
-def get_sentiment(text):
-    """Single OpenAI sentiment call, JSON-only output."""
+def get_sentiment_once(text: str, system_prompt: str = None):
+    """
+    Single call to OpenAI for JSON-only sentiment output.
+    Expects the model to return JSON like: {"sentiment_score": 7}
+    """
+    system_prompt = system_prompt or "Return JSON only with a numeric 'sentiment_score' between 1 and 10."
     try:
         r = client.chat.completions.create(
             model="gpt-4o-mini",
             messages=[
-                {"role": "system",
-                 "content": "Respond ONLY with valid JSON containing {\"sentiment_score\": number}."},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": text}
-            ]
+            ],
+            max_tokens=200,
         )
-        return json.loads(r.choices[0].message.content)
-    except Exception:
-        return {"sentiment_score": None}
+        content = r.choices[0].message.content
+        # attempt to extract JSON safely
+        parsed = json.loads(content)
+        return parsed.get("sentiment_score") if isinstance(parsed, dict) else None
+    except Exception as e:
+        # log and return None on failure
+        print("OpenAI sentiment call failed:", e)
+        return None
 
 
-def run_iterative_sentiment(df, iterations=5, sleep=1):
-    all_results = []
-
-    for text in tqdm(df["text"], desc="OpenAI sentiment"):
+def run_iterative_sentiment(df, iterations=3, delay=1.0):
+    """
+    For each text row, call get_sentiment_once() 'iterations' times.
+    Adds columns: openai_scores (list), openai_mean, openai_std
+    """
+    scores_all = []
+    for text in df["text"].fillna("").tolist():
         scores = []
         for _ in range(iterations):
-            s = get_sentiment(text)
-            scores.append(s.get("sentiment_score"))
-            time.sleep(sleep)
-        all_results.append(scores)
+            s = get_sentiment_once(text)
+            scores.append(s)
+            time.sleep(delay)
+        scores_all.append(scores)
 
-    df["openai_scores"] = all_results
+    df = df.copy()
+    df["openai_scores"] = scores_all
     df["openai_mean"] = df["openai_scores"].apply(
-        lambda x: np.mean([v for v in x if v is not None]) if x else None
+        lambda lst: np.mean([v for v in lst if isinstance(v, (int, float))]) if any(isinstance(v, (int, float)) for v in lst) else None
     )
     df["openai_std"] = df["openai_scores"].apply(
-        lambda x: np.std([v for v in x if v is not None]) if x else None
+        lambda lst: np.std([v for v in lst if isinstance(v, (int, float))]) if any(isinstance(v, (int, float)) for v in lst) else None
     )
     return df
