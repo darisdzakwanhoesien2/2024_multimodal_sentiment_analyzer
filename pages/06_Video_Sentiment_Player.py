@@ -1,21 +1,21 @@
 import streamlit as st
 import json
-import time
-import matplotlib.pyplot as plt
 import numpy as np
+import matplotlib.pyplot as plt
 
 from ui.utils import list_datasets, load_csv
 from pipeline.run_lexicon_pipeline import run_lexicon_pipeline
 
 # =====================================================
-# Streamlit setup
+# Page setup
 # =====================================================
 st.set_page_config(layout="wide")
-st.title("🎥 Video + Subtitle + Sentiment Timeline (Matplotlib)")
+st.title("🎥 Video + Subtitle + Sentiment (Stable View)")
 
 st.markdown("""
-This view synchronizes **video**, **subtitles**, and **sentiment scores**
-using a **shared timeline controller**.
+This page synchronizes **subtitles** and **sentiment** using a shared timeline.
+
+⚠️ Due to Streamlit limitations, **the slider is the master clock**.
 """)
 
 # =====================================================
@@ -41,7 +41,7 @@ json_path = dataset / "transcription_result.json"
 csv_path = dataset / "transcription_result.csv"
 
 if not json_path.exists():
-    st.error("transcription_result.json not found")
+    st.error("❌ transcription_result.json not found")
     st.stop()
 
 # =====================================================
@@ -57,50 +57,20 @@ if df is None:
 # Load transcription
 # =====================================================
 with open(json_path, "r", encoding="utf-8") as f:
-    transcription = json.load(f)
+    segments = json.load(f)["segments"]
 
-segments = transcription["segments"]
+# =====================================================
+# Timeline
+# =====================================================
 max_time = float(df["end"].max())
 
-# =====================================================
-# Session state
-# =====================================================
-if "playing" not in st.session_state:
-    st.session_state.playing = False
-if "t" not in st.session_state:
-    st.session_state.t = 0.0
-
-# =====================================================
-# Controls
-# =====================================================
-c1, c2, c3 = st.columns([1, 1, 6])
-
-with c1:
-    if st.button("▶️ Play"):
-        st.session_state.playing = True
-
-with c2:
-    if st.button("⏸ Pause"):
-        st.session_state.playing = False
-
-with c3:
-    st.session_state.t = st.slider(
-        "Timeline (seconds)",
-        0.0,
-        max_time,
-        st.session_state.t,
-        step=0.1
-    )
-
-# =====================================================
-# Auto-play timeline
-# =====================================================
-if st.session_state.playing:
-    st.session_state.t += 0.1
-    if st.session_state.t > max_time:
-        st.session_state.t = 0.0
-    time.sleep(0.1)
-    st.experimental_rerun()
+t = st.slider(
+    "Timeline (seconds)",
+    min_value=0.0,
+    max_value=max_time,
+    value=0.0,
+    step=0.1
+)
 
 # =====================================================
 # Layout
@@ -112,7 +82,6 @@ left, right = st.columns([2, 3])
 # =====================================================
 with left:
     st.subheader("🎥 Video")
-
     if video_file:
         st.video(str(video_file))
     else:
@@ -122,61 +91,79 @@ with left:
 
     active = [
         s for s in segments
-        if s["start"] <= st.session_state.t <= s["end"]
+        if s["start"] <= t <= s["end"]
     ]
 
-    if active:
-        seg = active[0]
-        st.markdown(
-            f"**[{seg['start']:.2f}s – {seg['end']:.2f}s]**\n\n{seg['text']}"
-        )
-    else:
-        st.info("No subtitle at this time")
+    if not active:
+        active = sorted(
+            segments,
+            key=lambda s: abs((s["start"] + s["end"]) / 2 - t)
+        )[:1]
+
+    seg = active[0]
+    st.markdown(
+        f"""
+        **⏱ {seg['start']:.2f}s – {seg['end']:.2f}s**
+
+        > {seg['text']}
+        """
+    )
 
 # =====================================================
-# RIGHT — Matplotlib sentiment plot
+# RIGHT — Sentiment plot (matplotlib)
 # =====================================================
 with right:
     st.subheader("📈 Sentiment Over Time")
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    # Prepare interpolation
+    segment_times = df["start"].values
+    t_dense = np.linspace(0, max_time, 500)
 
-    ax.plot(
-        df["start"],
+    lex_interp = np.interp(
+        t_dense,
+        segment_times,
+        df["nltk_opinion_lexicon_net"]
+    )
+
+    vader_interp = np.interp(
+        t_dense,
+        segment_times,
+        df["vader_compound"]
+    )
+
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+
+    ax.plot(t_dense, lex_interp, label="Lexicon Net", linewidth=2)
+    ax.plot(t_dense, vader_interp, label="VADER Compound", linewidth=2)
+
+    # Original segment points
+    ax.scatter(
+        segment_times,
         df["nltk_opinion_lexicon_net"],
-        label="Lexicon Net",
-        marker="o"
+        alpha=0.4
     )
-
-    ax.plot(
-        df["start"],
+    ax.scatter(
+        segment_times,
         df["vader_compound"],
-        label="VADER Compound",
-        marker="o"
+        alpha=0.4
     )
 
-    if "openai_mean_sentiment" in df.columns:
-        ax.plot(
-            df["start"],
-            df["openai_mean_sentiment"],
-            label="OpenAI Sentiment",
-            marker="o"
-        )
-
-    # Vertical cursor
+    # Cursor
     ax.axvline(
-        st.session_state.t,
+        t,
         color="black",
         linestyle="--",
         linewidth=2,
         label="Current time"
     )
 
+    ax.set_xlim(0, max_time)
+    ax.set_ylim(-1, 1)
     ax.set_xlabel("Time (seconds)")
     ax.set_ylabel("Sentiment score")
     ax.set_title("Sentiment Trajectory")
     ax.legend()
-    ax.grid(True)
+    ax.grid(True, alpha=0.3)
 
     st.pyplot(fig)
 
@@ -184,15 +171,15 @@ with right:
 # Optional table
 # =====================================================
 with st.expander("📊 Segment-level sentiment table"):
-    cols = [
-        "start", "end",
-        "nltk_opinion_lexicon_net",
-        "vader_compound"
-    ]
-    if "openai_mean_sentiment" in df.columns:
-        cols.append("openai_mean_sentiment")
-
-    st.dataframe(df[cols], use_container_width=True)
+    st.dataframe(
+        df[[
+            "start",
+            "end",
+            "nltk_opinion_lexicon_net",
+            "vader_compound"
+        ]],
+        use_container_width=True
+    )
 
 
 # import streamlit as st
