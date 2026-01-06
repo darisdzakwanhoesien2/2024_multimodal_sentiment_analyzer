@@ -1,24 +1,67 @@
-# ui/utils.py
 from pathlib import Path
-import json
 import pandas as pd
+import json
 
-ROOT = Path(__file__).resolve().parents[1]
+# =====================================================
+# Project paths
+# =====================================================
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_ROOT = PROJECT_ROOT / "data"
 
+# =====================================================
+# Dataset discovery
+# =====================================================
 def list_datasets():
     """
-    Return folders like data_1, data_2, data_3 located at project root
+    List all dataset folders under data/
     """
-    return sorted([
-        p for p in ROOT.iterdir()
-        if p.is_dir() and p.name.startswith("data_")
-    ])
+    if not DATA_ROOT.exists():
+        return []
+    return sorted(
+        [p for p in DATA_ROOT.iterdir() if p.is_dir()]
+    )
 
-def load_json(path):
-    if path.exists():
-        with open(path, "r", encoding="utf-8") as f:
-            return json.load(f)
+# =====================================================
+# Load helpers (safe)
+# =====================================================
+def load_csv(path: Path):
+    try:
+        if path.exists():
+            return pd.read_csv(path)
+    except Exception:
+        pass
     return None
 
-def load_csv(path):
-    return pd.read_csv(path) if path.exists() else None
+def load_json(path: Path):
+    try:
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                return json.load(f)
+    except Exception:
+        pass
+    return None
+
+# # ui/utils.py
+# from pathlib import Path
+# import json
+# import pandas as pd
+
+# ROOT = Path(__file__).resolve().parents[1]
+
+# def list_datasets():
+#     """
+#     Return folders like data_1, data_2, data_3 located at project root
+#     """
+#     return sorted([
+#         p for p in ROOT.iterdir()
+#         if p.is_dir() and p.name.startswith("data_")
+#     ])
+
+# def load_json(path):
+#     if path.exists():
+#         with open(path, "r", encoding="utf-8") as f:
+#             return json.load(f)
+#     return None
+
+# def load_csv(path):
+#     return pd.read_csv(path) if path.exists() else None

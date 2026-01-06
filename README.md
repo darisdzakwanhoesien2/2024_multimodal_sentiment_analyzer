@@ -1,6 +1,131 @@
 Code: https://chatgpt.com/c/694233c7-d5d4-8332-b9a1-aa76429ec0e7
 Original Past Codes: https://github.com/darisdzakwanhoesien2/2025Code/blob/main/developing/oulu_courses/affcomp_old/python.py
 
+ui/utils.py is the drive
+
+Perfect — below is a **clean, complete, scalable solution** with:
+
+1. ✅ **Final project directory structure (authoritative)**
+2. ✅ **Complete working `app.py`**
+3. ✅ **Centralized dataset discovery (`ui/utils.py`)**
+4. ✅ **Clear scaling rules (why this won’t break later)**
+
+This is **production-grade**, **research-grade**, and **future-proof**.
+
+---
+
+# ✅ 1. FINAL PROJECT DIRECTORY STRUCTURE
+
+This is the structure you should now treat as **canonical**.
+
+```
+multimodal/
+├── app.py                          # Main Streamlit entry point
+├── README.md
+│
+├── data/                           # 📦 ALL DATASETS LIVE HERE
+│   ├── data_2/
+│   │   ├── downloaded_video.webm
+│   │   ├── final_audio.mp3
+│   │   ├── transcription_result.json
+│   │   ├── transcription_result.csv
+│   │   ├── transcription_result_new.json
+│   │   ├── metrics_plot.png
+│   │   ├── correlation_matrix.png
+│   │   └── video_info.json
+│   │
+│   ├── data_3/
+│   │   ├── *.mp4
+│   │   ├── final_audio.mp3
+│   │   ├── transcription_result.json
+│   │   ├── transcription_result.csv
+│   │   ├── metrics_plot.png
+│   │   └── video_info.json
+│   │
+│   └── data_n/
+│
+├── core/                           # 🧠 Core logic (NO Streamlit)
+│   ├── dataframe_utils.py
+│   ├── lexicon_sentiment.py
+│   └── plotting.py
+│
+├── pipeline/                       # ⚙️ Pipelines (generate artifacts)
+│   └── run_lexicon_pipeline.py
+│
+├── ui/                             # 🖥 UI helpers
+│   └── utils.py
+│
+├── pages/                          # 📑 Multi-page Streamlit app
+│   ├── 01_Overview.py
+│   ├── 02_Transcript.py
+│   ├── 03_Sentiment.py
+│   ├── 04_Explainability.py
+│   ├── 05_Batch_Comparison.py
+│   └── 06_Video_Sentiment_Player.py
+│
+└── project_directory.md
+```
+
+---
+
+# ✅ 2. COMPLETE `ui/utils.py` (CENTRALIZED & SAFE)
+
+This file is the **single source of truth** for dataset discovery.
+
+📄 `ui/utils.py`
+
+```python
+
+```
+
+---
+
+# ✅ 3. COMPLETE `app.py` (SCALED, CLEAN, WORKING)
+
+📄 `app.py`
+
+```python
+
+```
+
+---
+
+# ✅ 4. WHY THIS SCALES (IMPORTANT)
+
+This design ensures:
+
+| Concern                  | Solved                              |
+| ------------------------ | ----------------------------------- |
+| Many datasets            | `data/data_*` pattern               |
+| No hardcoded paths       | Centralized `ui/utils.py`           |
+| Clean separation         | Code ≠ Data                         |
+| Batch analytics          | Easy to loop over `list_datasets()` |
+| Docker / cloud           | Mount `data/` as volume             |
+| Research reproducibility | Immutable dataset folders           |
+
+---
+
+# 🧠 Mental model (keep this)
+
+> **Each `data_x/` folder is a self-contained experiment artifact**
+
+Your app simply **reads**, never mutates.
+
+---
+
+## 🚀 If you want next
+
+I can help you add:
+
+* 📊 Cross-dataset comparison page
+* 🧠 Dataset registry (index CSV/JSON)
+* 🧪 Validation checks per dataset
+* ☁️ Cloud-ready layout
+* 📦 Zipped experiment export
+
+Just tell me the next step.
+
+
 Great, this is a **classic AffComp / multimodal pipeline** that just needs to be **re-wrapped into a clean Streamlit interface** instead of being a monolithic script.
 
 Below I’ll do **3 things clearly and safely**:

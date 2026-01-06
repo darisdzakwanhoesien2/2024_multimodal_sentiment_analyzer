@@ -1,0 +1,119 @@
+{
+    "overall_mean_sentiment": 0.7,
+    "overall_standard_deviation": 0.0,
+    "combined_standard_deviation": 0.0,
+    "segments": [
+        {
+            "id": 0,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 1,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 2,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 3,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 4,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 5,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 6,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 7,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 8,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": NaN,
+            "std_sentiment": NaN,
+            "tokens": []
+        },
+        {
+            "id": 9,
+            "nltk_opinion_lexicon_net": 0,
+            "vader_neg": 0,
+            "vader_neu": 0,
+            "vader_pos": 0,
+            "vader_compound": 0,
+            "openai_mean_sentiment": 0.7,
+            "std_sentiment": 0.0,
+            "tokens": [
+                7.0
+            ]
+        }
+    ]
+}
