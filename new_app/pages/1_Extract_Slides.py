@@ -5,12 +5,37 @@ import io
 
 import streamlit as st
 
-from utils.video_processing import extract_unique_frames
+from new_app.utils.video_processing import extract_unique_frames
+import os
+
+# Determine project root and downloads directory (robust when running from repo root or via streamlit)
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DOWNLOADS_DIR = PROJECT_ROOT / "downloads"
+# Ensure downloads dir exists (may be empty)
+DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 st.title("Extract Slides from Video")
 
-uploaded_file = st.file_uploader("Upload a presentation video", type=["mp4", "mov", "mkv", "avi"])
+# Allow choosing between uploading or selecting an existing file
+source = st.radio("Source", ["Upload new file", "Use existing resource"], index=0)
+
+uploaded_file = None
+selected_existing = None
+existing_files = sorted(
+    [p.name for p in DOWNLOADS_DIR.iterdir() if p.is_file() and p.suffix.lower() in {".mp4", ".mov", ".mkv", ".avi"}]
+)
+
+if source == "Upload new file":
+    uploaded_file = st.file_uploader("Upload a presentation video", type=["mp4", "mov", "mkv", "avi"])
+else:
+    if not existing_files:
+        st.info(f"No video files found in {DOWNLOADS_DIR}. You can upload one instead.")
+    else:
+        selected_existing = st.selectbox("Select a file from downloads", existing_files)
+        if selected_existing:
+            st.write(f"Selected: {selected_existing}")
+            st.video(str(DOWNLOADS_DIR / selected_existing))
 
 threshold = st.slider(
     "Change threshold",
@@ -46,18 +71,27 @@ cols_per_row = st.slider(
     help="Number of slides to display per row.",
 )
 
-if uploaded_file is not None:
+if source == "Upload new file" and uploaded_file is not None:
     suffix = Path(uploaded_file.name).suffix or ".mp4"
     with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as temp_video:
         temp_video.write(uploaded_file.read())
         temp_video_path = temp_video.name
 
     st.video(temp_video_path)
+    video_path_to_process = temp_video_path
 
-    if st.button("Process video", type="primary"):
+elif source == "Use existing resource" and selected_existing:
+    video_path_to_process = str(DOWNLOADS_DIR / selected_existing)
+else:
+    video_path_to_process = None
+
+if st.button("Process video", type="primary"):
+    if not video_path_to_process:
+        st.error("No video selected. Upload a file or choose an existing resource.")
+    else:
         with st.spinner("Detecting slide changes..."):
             results = extract_unique_frames(
-                temp_video_path,
+                video_path_to_process,
                 threshold=threshold,
                 frame_step=frame_step,
                 min_time_between_slides=min_gap_seconds,
@@ -82,7 +116,7 @@ if uploaded_file is not None:
             st.download_button(
                 label=f"⬇️ Download All {len(results)} Slides as ZIP",
                 data=zip_buffer,
-                file_name=f"{Path(uploaded_file.name).stem}_slides.zip",
+                file_name=f"{Path(video_path_to_process).stem}_slides.zip",
                 mime="application/zip",
             )
 
