@@ -117,7 +117,55 @@ def run_diarization(pipeline, audio_path: str, num_spk: int, min_spk: int, max_s
         if max_spk > 0:
             kwargs["max_speakers"] = max_spk
 
-    diarization = pipeline(audio_path, **kwargs)
+    # ── pre-process audio to fix sample count mismatch ────────────────────────
+    try:
+        import torchaudio
+        import torch
+
+        waveform, sample_rate = torchaudio.load(audio_path)
+
+        # Convert to mono if stereo
+        if waveform.shape[0] > 1:
+            waveform = waveform.mean(dim=0, keepdim=True)
+
+        # Resample to 16000 Hz (pyannote's expected sample rate)
+        target_sr = 16000
+        if sample_rate != target_sr:
+            resampler = torchaudio.transforms.Resample(
+                orig_freq=sample_rate, new_freq=target_sr
+            )
+            waveform = resampler(waveform)
+            sample_rate = target_sr
+
+        # Pad to nearest chunk boundary (10s chunks = 160000 samples at 16kHz)
+        chunk_samples = target_sr * 10  # 160000
+        total_samples = waveform.shape[1]
+        remainder = total_samples % chunk_samples
+        if remainder != 0:
+            pad_size = chunk_samples - remainder
+            waveform = torch.nn.functional.pad(waveform, (0, pad_size))
+
+        # Save the cleaned audio to a new temp file
+        cleaned_path = audio_path + "_cleaned.wav"
+        torchaudio.save(cleaned_path, waveform, sample_rate)
+        audio_path = cleaned_path
+
+    except Exception as e:
+        # If pre-processing fails, fall back to original file
+        st.warning(f"⚠️ Audio pre-processing skipped: {e}. Using original file.")
+        cleaned_path = None
+
+    # ── run pipeline ──────────────────────────────────────────────────────────
+    try:
+        diarization = pipeline(audio_path, **kwargs)
+    finally:
+        # Clean up the temporary cleaned file
+        if "cleaned_path" in dir() and cleaned_path and os.path.exists(cleaned_path):
+            try:
+                os.remove(cleaned_path)
+            except OSError:
+                pass
+
     rows = []
     for segment, _, label in diarization.itertracks(yield_label=True):
         rows.append({
