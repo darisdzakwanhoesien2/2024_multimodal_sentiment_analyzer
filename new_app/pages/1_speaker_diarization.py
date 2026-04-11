@@ -37,6 +37,9 @@ defaults = {
     "diar_done":       False,
     "diar_error":      "",
     "diar_file_name":  "",
+    "diar_transcript_text":     None,
+    "diar_transcript_segments": None,
+    "diar_segment_texts":       None,
 }
 for k, v in defaults.items():
     if k not in st.session_state:
@@ -55,7 +58,7 @@ with st.sidebar:
     if not hf_token:
         st.warning("⚠️ Token required. Go to **hf_token_test** to verify your token first.")
 
-    st.markdown("**Model**")
+    st.markdown("**Diarization Model**")
     model_choice = st.selectbox(
         "Pipeline",
         options=[
@@ -71,9 +74,57 @@ with st.sidebar:
     max_speakers = st.number_input("Max speakers (0 = auto)",        min_value=0, max_value=20, value=0)
 
     st.markdown("---")
+
+    # ── Transcription options ─────────────────────────────────────────────────
+    st.markdown("**Transcription (faster-whisper)**")
+    do_transcribe = st.checkbox(
+        "Transcribe audio", value=False,
+        help="Run faster-whisper transcription alongside diarization."
+    )
+
+    whisper_model_size = st.selectbox(
+        "Whisper model size",
+        options=["tiny", "base", "small", "medium", "large-v2", "large-v3"],
+        index=5,   # default to large-v3
+        help="large-v3 = best accuracy. tiny/base = fastest.",
+    )
+
+    # Local model path (from hf download or git clone)
+    local_model_path = st.text_input(
+        "Local model path (optional)",
+        value="",
+        placeholder="e.g. /path/to/faster-whisper-large-v3",
+        help=(
+            "If you cloned/downloaded the model locally with:\n"
+            "`hf download Systran/faster-whisper-large-v3`\n"
+            "or `git clone https://huggingface.co/Systran/faster-whisper-large-v3`\n"
+            "paste the folder path here. Leave blank to auto-download."
+        ),
+    )
+
+    whisper_device = st.selectbox(
+        "Compute device",
+        options=["auto", "cpu", "cuda"],
+        index=0,
+        help="'auto' picks CUDA if available, else CPU.",
+    )
+
+    whisper_compute_type = st.selectbox(
+        "Compute type",
+        options=["default", "int8", "int8_float16", "float16", "float32"],
+        index=1,   # int8 = fast on CPU
+        help="int8 = fastest on CPU. float16 = best GPU speed. default = library decides.",
+    )
+
+    whisper_language = st.text_input(
+        "Language code (optional)",
+        value="",
+        placeholder="e.g. en, ms, zh",
+        help="Leave blank for auto-detect.",
+    )
+
     st.page_link("pages/0_hf_token_test.py", label="🔑 Test your HF token first", icon="🔑")
 
-    # clear results button
     if st.button("🗑️ Clear results"):
         for k in defaults:
             st.session_state[k] = defaults[k]
@@ -83,16 +134,13 @@ with st.sidebar:
 # ── helpers ───────────────────────────────────────────────────────────────────
 @st.cache_resource(show_spinner="Loading pipeline…")
 def load_pipeline(token: str, repo_id: str):
-    """Load and cache the pyannote pipeline (pyannote.audio 4.x)."""
     if not token:
         raise RuntimeError("A Hugging Face token is required.")
-
     try:
         from huggingface_hub import login as hf_login
         hf_login(token=token, add_to_git_credential=False)
     except Exception as e:
         raise RuntimeError(f"Hugging Face login failed: {e}") from e
-
     try:
         return Pipeline.from_pretrained(repo_id, token=token)
     except Exception as e:
@@ -109,6 +157,23 @@ def load_pipeline(token: str, repo_id: str):
         raise RuntimeError(f"Failed to load `{repo_id}`:\n{e}") from e
 
 
+@st.cache_resource(show_spinner="Loading faster-whisper model…")
+def load_whisper_model(model_size_or_path: str, device: str, compute_type: str):
+    """Load and cache a faster-whisper WhisperModel."""
+    try:
+        from faster_whisper import WhisperModel
+    except ImportError:
+        raise RuntimeError(
+            "faster-whisper is not installed.\n"
+            "Run: pip install faster-whisper"
+        )
+    ct = compute_type if compute_type != "default" else None
+    kwargs = dict(device=device)
+    if ct:
+        kwargs["compute_type"] = ct
+    return WhisperModel(model_size_or_path, **kwargs)
+
+
 def run_diarization(pipeline, audio_path: str, num_spk: int, min_spk: int, max_spk: int):
     kwargs = {}
     if num_spk > 0:
@@ -119,72 +184,57 @@ def run_diarization(pipeline, audio_path: str, num_spk: int, min_spk: int, max_s
         if max_spk > 0:
             kwargs["max_speakers"] = max_spk
 
-    # ── pre-process audio to fix sample count mismatch ────────────────────────
+    # ── pre-process audio ─────────────────────────────────────────────────────
+    cleaned_path = None
     try:
         import torchaudio
         import torch
 
         waveform, sample_rate = torchaudio.load(audio_path)
-
-        # Convert to mono if stereo
         if waveform.shape[0] > 1:
             waveform = waveform.mean(dim=0, keepdim=True)
 
-        # Resample to 16000 Hz (pyannote's expected sample rate)
         target_sr = 16000
         if sample_rate != target_sr:
-            resampler = torchaudio.transforms.Resample(
-                orig_freq=sample_rate, new_freq=target_sr
-            )
+            resampler = torchaudio.transforms.Resample(orig_freq=sample_rate, new_freq=target_sr)
             waveform = resampler(waveform)
             sample_rate = target_sr
 
-        # Pad to nearest chunk boundary (10s chunks = 160000 samples at 16kHz)
-        chunk_samples = target_sr * 10  # 160000
-        total_samples = waveform.shape[1]
-        remainder = total_samples % chunk_samples
+        chunk_samples = target_sr * 10
+        remainder = waveform.shape[1] % chunk_samples
         if remainder != 0:
-            pad_size = chunk_samples - remainder
-            waveform = torch.nn.functional.pad(waveform, (0, pad_size))
+            waveform = torch.nn.functional.pad(waveform, (0, chunk_samples - remainder))
 
-        # Save the cleaned audio to a new temp file
         cleaned_path = audio_path + "_cleaned.wav"
         torchaudio.save(cleaned_path, waveform, sample_rate)
         audio_path = cleaned_path
 
     except Exception as e:
-        # If pre-processing fails, fall back to original file
         st.warning(f"⚠️ Audio pre-processing skipped: {e}. Using original file.")
-        cleaned_path = None
 
     # ── run pipeline ──────────────────────────────────────────────────────────
     try:
         diarization = pipeline(audio_path, **kwargs)
     finally:
-        # Clean up the temporary cleaned file
-        if "cleaned_path" in dir() and cleaned_path and os.path.exists(cleaned_path):
+        if cleaned_path and os.path.exists(cleaned_path):
             try:
                 os.remove(cleaned_path)
             except OSError:
                 pass
 
-    # ── compatibility: support both Annotation.itertracks and DiarizeOutput-like ─
+    # ── iterate diarization output ────────────────────────────────────────────
     def _iter_diarization(diar):
         def _seg_obj(s):
-            # return an object with .start and .end
             if hasattr(s, "start") and hasattr(s, "end"):
                 return s
             if isinstance(s, (list, tuple)) and len(s) >= 2:
-                start, end = float(s[0]), float(s[1])
-                return type("Seg", (), {"start": start, "end": end})()
+                return type("Seg", (), {"start": float(s[0]), "end": float(s[1])})()
             raise TypeError("Unsupported segment type")
 
-        # pyannote.core.Annotation-like
         if hasattr(diar, "itertracks"):
             yield from diar.itertracks(yield_label=True)
             return
 
-        # DiarizeOutput-like: common attributes
         segs = getattr(diar, "segments", None) or getattr(diar, "segments_", None)
         labs = getattr(diar, "labels", None) or getattr(diar, "labels_", None)
         if segs is not None and labs is not None:
@@ -192,107 +242,101 @@ def run_diarization(pipeline, audio_path: str, num_spk: int, min_spk: int, max_s
                 yield _seg_obj(s), None, l
             return
 
-        # get_timeline() + labels()
-        get_tl = getattr(diar, "get_timeline", None)
-        if callable(get_tl):
-            try:
-                tl = get_tl()
-                if hasattr(tl, "__iter__"):
-                    # try paired labels first
-                    labs = getattr(diar, "labels", None) or getattr(diar, "labels_", None)
-                    if labs is not None:
-                        for s, l in zip(tl, labs):
-                            yield _seg_obj(s), None, l
-                        return
-                    # fallback: timeline may yield (segment, label) pairs
-                    for item in tl:
-                        if isinstance(item, (list, tuple)) and len(item) >= 2:
-                            s, l = item[0], item[1]
-                            yield _seg_obj(s), None, l
-                    return
-            except Exception:
-                pass
-
-        # iterable of (segment, label) or (segment, _, label)
-        if isinstance(diar, (list, tuple)):
-            for item in diar:
-                if isinstance(item, (list, tuple)):
-                    if len(item) == 2:
-                        s, l = item
-                        yield _seg_obj(s), None, l
-                    elif len(item) >= 3:
-                        yield _seg_obj(item[0]), None, item[-1]
-            return
-
-        # dict-like wrappers
         if isinstance(diar, dict):
             for key in ("annotation", "diarization", "output", "result"):
                 if key in diar:
                     yield from _iter_diarization(diar[key])
                     return
 
-        # Inspect object's attributes / dataclass internals for lists/pairs
-        try:
-            attrs = getattr(diar, "__dict__", None)
-            if isinstance(attrs, dict):
-                # look for an attribute that is list/tuple of (segment, label) pairs
-                for name, val in attrs.items():
-                    if name.startswith("_"):
-                        continue
-                    if hasattr(val, "itertracks"):
-                        yield from val.itertracks(yield_label=True)
-                        return
-                    if isinstance(val, (list, tuple)) and val:
-                        first = val[0]
-                        # list of (segment, label) pairs
-                        if isinstance(first, (list, tuple)) and len(first) >= 2:
-                            for item in val:
-                                if isinstance(item, (list, tuple)) and len(item) >= 2:
-                                    yield _seg_obj(item[0]), None, item[1]
-                            return
-                        # list of segments + separate labels attribute
-                        for label_key in ("labels", "labels_", "speakers", "speaker_labels"):
-                            lbls = attrs.get(label_key)
-                            if isinstance(lbls, (list, tuple)) and len(lbls) == len(val):
-                                for s, l in zip(val, lbls):
-                                    yield _seg_obj(s), None, l
-                                return
-                        # list of segment-like objects only -> try to extract speaker field per item
-                        if hasattr(first, "start") and hasattr(first, "end"):
-                            for s in val:
-                                label = getattr(s, "label", None) or getattr(s, "speaker", None) or "SPEAKER_0"
-                                yield _seg_obj(s), None, label
-                            return
-        except Exception:
-            pass
+        attrs = getattr(diar, "__dict__", {})
+        for name, val in attrs.items():
+            if name.startswith("_"):
+                continue
+            if hasattr(val, "itertracks"):
+                yield from val.itertracks(yield_label=True)
+                return
+            if isinstance(val, (list, tuple)) and val:
+                first = val[0]
+                if hasattr(first, "start") and hasattr(first, "end"):
+                    for s in val:
+                        label = getattr(s, "label", None) or getattr(s, "speaker", None) or "SPEAKER_0"
+                        yield _seg_obj(s), None, label
+                    return
 
-        # last attempt: attributes that look like pairs (informative failure)
         raise RuntimeError(
-            f"Unsupported diarization output (type={type(diar)}). "
-            "No 'itertracks', nor matching 'segments'/'labels', nor iterable pairs found."
+            f"Unsupported diarization output (type={type(diar)}).\n"
+            f"Attributes: {list(getattr(diar, '__dict__', {}).keys())}"
         )
 
     rows = []
-    for segment, _, label in _iter_diarization(diarization):
-        rows.append({
-            "start":    round(float(segment.start), 3),
-            "end":      round(float(segment.end),   3),
-            "duration": round(float(segment.end - segment.start), 3),
-            "speaker":  label,
-        })
-    df = pd.DataFrame(rows).sort_values("start").reset_index(drop=True)
-
-    # build RTTM in-memory
     rttm_lines = []
     for segment, _, label in _iter_diarization(diarization):
+        start = round(float(segment.start), 3)
+        end   = round(float(segment.end),   3)
+        dur   = round(end - start,           3)
+        rows.append({"start": start, "end": end, "duration": dur, "speaker": label})
         rttm_lines.append(
-            f"SPEAKER file 1 {segment.start:.3f} "
-            f"{(segment.end - segment.start):.3f} "
-            f"<NA> <NA> {label} <NA> <NA>"
+            f"SPEAKER file 1 {start:.3f} {dur:.3f} <NA> <NA> {label} <NA> <NA>"
         )
-    rttm_str = "\n".join(rttm_lines) + "\n"
 
+    df = pd.DataFrame(rows).sort_values("start").reset_index(drop=True)
+    rttm_str = "\n".join(rttm_lines) + "\n"
     return df, rttm_str
+
+
+def run_transcription(
+    audio_path: str,
+    model_size_or_path: str = "large-v3",
+    device: str = "auto",
+    compute_type: str = "int8",
+    language: str | None = None,
+):
+    """
+    Transcribe audio with faster-whisper.
+    Returns (full_text, segments) where segments is list of dicts: {start, end, text}.
+    """
+    whisper_model = load_whisper_model(model_size_or_path, device, compute_type)
+
+    kwargs = dict(beam_size=5, vad_filter=True)
+    if language:
+        kwargs["language"] = language
+
+    segments_gen, info = whisper_model.transcribe(audio_path, **kwargs)
+
+    out_segments = []
+    full_text_parts = []
+    for seg in segments_gen:
+        out_segments.append({
+            "start": round(float(seg.start), 3),
+            "end":   round(float(seg.end),   3),
+            "text":  seg.text.strip(),
+        })
+        full_text_parts.append(seg.text.strip())
+
+    full_text = " ".join(full_text_parts)
+    return full_text, out_segments, info
+
+
+def align_transcript_with_speakers(diar_df: pd.DataFrame, whisper_segments: list):
+    """Align whisper segments to diarization speaker segments by overlap."""
+    if diar_df is None or diar_df.empty:
+        return pd.DataFrame(columns=["start", "end", "duration", "speaker", "text"])
+
+    def overlap(s1, e1, s2, e2):
+        return max(0.0, min(e1, e2) - max(s1, s2))
+
+    rows = []
+    for _, row in diar_df.iterrows():
+        s0, e0 = float(row["start"]), float(row["end"])
+        pieces = [w["text"] for w in whisper_segments if overlap(s0, e0, w["start"], w["end"]) > 0]
+        rows.append({
+            "start":    row["start"],
+            "end":      row["end"],
+            "duration": row["duration"],
+            "speaker":  row["speaker"],
+            "text":     " ".join(pieces).strip(),
+        })
+    return pd.DataFrame(rows).sort_values("start").reset_index(drop=True)
 
 
 def plot_diarization(df: pd.DataFrame):
@@ -338,14 +382,13 @@ def speaker_stats(df: pd.DataFrame) -> pd.DataFrame:
 
 # ── main ──────────────────────────────────────────────────────────────────────
 uploaded = st.file_uploader(
-    "Upload audio file",
-    type=["wav", "mp3", "m4a", "flac", "ogg", "mp4"],
-    help="Mono or stereo audio. Long files (>30 min) may take several minutes.",
+    "Upload audio / video file",
+    type=["wav", "mp3", "m4a", "flac", "ogg", "mp4", "mkv", "mov"],
+    help="Mono or stereo. Long files (>30 min) may take several minutes.",
 )
 
 if uploaded:
     st.audio(uploaded)
-    # clear old results when a new file is uploaded
     if uploaded.name != st.session_state.diar_file_name:
         for k in defaults:
             st.session_state[k] = defaults[k]
@@ -358,51 +401,46 @@ if run_btn and uploaded:
         st.error("❌ Please enter your Hugging Face token in the sidebar.")
         st.stop()
 
-    # reset previous results before new run
     st.session_state.diar_done  = False
     st.session_state.diar_error = ""
     st.session_state.diar_df    = None
     st.session_state.diar_rttm  = ""
+    st.session_state.diar_transcript_text     = None
+    st.session_state.diar_transcript_segments = None
+    st.session_state.diar_segment_texts       = None
 
-    tmp_path = None
+    orig_tmp_path  = None
     tmp_audio_path = None
+
     try:
-        suffix = os.path.splitext(uploaded.name)[1] or ".wav"
+        suffix = os.path.splitext(uploaded.name)[1].lower() or ".wav"
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(uploaded.getbuffer())
-            tmp_path = tmp.name
-        orig_tmp_path = tmp_path
+            orig_tmp_path = tmp.name
 
-        # If user uploaded an MP4 (video), extract audio with ffmpeg -> WAV
+        tmp_path = orig_tmp_path
+
+        # ── extract audio from video ──────────────────────────────────────────
         video_exts = {".mp4", ".mkv", ".mov", ".avi"}
-        if suffix.lower() in video_exts:
+        if suffix in video_exts:
             if shutil.which("ffmpeg") is None:
-                st.warning("ffmpeg not found. Install it on macOS with: brew install ffmpeg")
+                st.warning("⚠️ ffmpeg not found. Install: `brew install ffmpeg`")
             else:
                 try:
-                    tmp_audio = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
-                    tmp_audio_path = tmp_audio.name
-                    tmp_audio.close()
-                    cmd = [
-                        "ffmpeg", "-y", "-i", orig_tmp_path,
-                        "-vn",            # no video
-                        "-ac", "1",      # mono
-                        "-ar", "16000",  # sample rate (optional; run_diarization will resample if needed)
-                        tmp_audio_path,
-                    ]
-                    subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-                    tmp_path = tmp_audio_path  # use converted audio for processing
+                    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as ta:
+                        tmp_audio_path = ta.name
+                    subprocess.run(
+                        ["ffmpeg", "-y", "-i", orig_tmp_path,
+                         "-vn", "-ac", "1", "-ar", "16000", tmp_audio_path],
+                        check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                    )
+                    tmp_path = tmp_audio_path
                 except subprocess.CalledProcessError as e:
-                    st.warning(f"⚠️ ffmpeg conversion failed: {e}. Using original uploaded file.")
-                    if tmp_audio_path and os.path.exists(tmp_audio_path):
-                        try:
-                            os.remove(tmp_audio_path)
-                        except OSError:
-                            pass
+                    st.warning(f"⚠️ ffmpeg failed: {e}. Using original file.")
                     tmp_audio_path = None
 
-        # load pipeline
-        with st.status("Loading pipeline…", expanded=True) as status:
+        # ── load diarization pipeline ─────────────────────────────────────────
+        with st.status("Loading diarization pipeline…", expanded=True) as status:
             try:
                 pipeline = load_pipeline(hf_token, model_choice)
                 status.update(label=f"✅ Pipeline loaded: `{model_choice}`", state="complete")
@@ -411,42 +449,68 @@ if run_btn and uploaded:
                 st.session_state.diar_error = str(e)
                 st.stop()
 
-        # run diarization
-        with st.spinner("Running diarization… (this may take a while for long audio)"):
+        # ── diarization ───────────────────────────────────────────────────────
+        with st.spinner("Running diarization…"):
             df, rttm_str = run_diarization(
                 pipeline, tmp_path,
                 int(num_speakers), int(min_speakers), int(max_speakers),
             )
 
-        # store in session state so results persist across reruns
-        st.session_state.diar_df       = df
-        st.session_state.diar_rttm     = rttm_str
-        st.session_state.diar_done     = True
+        # ── transcription (faster-whisper) ────────────────────────────────────
+        if do_transcribe:
+            try:
+                # resolve model: prefer local path if provided
+                model_ref = local_model_path.strip() if local_model_path.strip() else whisper_model_size
+                device_   = whisper_device if whisper_device != "auto" else (
+                    "cuda" if __import__("torch").cuda.is_available() else "cpu"
+                )
+                lang = whisper_language.strip() or None
+
+                with st.spinner(f"Transcribing with faster-whisper `{model_ref}` on `{device_}`…"):
+                    full_text, w_segments, info = run_transcription(
+                        tmp_path,
+                        model_size_or_path=model_ref,
+                        device=device_,
+                        compute_type=whisper_compute_type,
+                        language=lang,
+                    )
+                    aligned = align_transcript_with_speakers(df, w_segments)
+
+                st.session_state.diar_transcript_text     = full_text
+                st.session_state.diar_transcript_segments = w_segments
+                st.session_state.diar_segment_texts       = aligned
+                st.caption(
+                    f"🌐 Detected language: **{info.language}** "
+                    f"(probability {info.language_probability:.0%})"
+                )
+            except Exception as e:
+                st.warning(f"⚠️ Transcription skipped: {e}")
+
+        # ── persist results ───────────────────────────────────────────────────
+        st.session_state.diar_df        = df
+        st.session_state.diar_rttm      = rttm_str
+        st.session_state.diar_done      = True
         st.session_state.diar_file_name = uploaded.name
 
     except Exception as e:
         st.session_state.diar_error = str(e)
     finally:
-        # clean up original upload + possible converted audio
-        for p in (locals().get("orig_tmp_path"), locals().get("tmp_audio_path")):
+        for p in [orig_tmp_path, tmp_audio_path]:
             if p and os.path.exists(p):
                 try:
                     os.remove(p)
                 except OSError:
                     pass
 
-# ── render results (persists across reruns) ───────────────────────────────────
+# ── render results ────────────────────────────────────────────────────────────
 if st.session_state.diar_error:
     st.error(f"❌ Diarization failed: {st.session_state.diar_error}")
 
 if st.session_state.diar_done and st.session_state.diar_df is not None:
     df = st.session_state.diar_df
+    st.success(f"✅ Done! Found **{df['speaker'].nunique()} speaker(s)**, **{len(df)} segments**.")
 
-    st.success(
-        f"✅ Done! Found **{df['speaker'].nunique()} speaker(s)**, **{len(df)} segments**."
-    )
-
-    tab1, tab2, tab3 = st.tabs(["📊 Timeline", "📋 Segments", "📈 Statistics"])
+    tab1, tab2, tab3, tab4 = st.tabs(["📊 Timeline", "📋 Segments", "📈 Statistics", "📝 Transcript"])
 
     with tab1:
         plot_diarization(df)
@@ -457,16 +521,13 @@ if st.session_state.diar_done and st.session_state.diar_df is not None:
             use_container_width=True,
         )
         st.download_button(
-            "⬇ Download CSV",
-            data=df.to_csv(index=False).encode(),
-            file_name=f"{st.session_state.diar_file_name}.csv",
-            mime="text/csv",
+            "⬇ Download CSV", data=df.to_csv(index=False).encode(),
+            file_name=f"{st.session_state.diar_file_name}.csv", mime="text/csv",
         )
 
     with tab3:
         stats = speaker_stats(df)
         st.dataframe(stats, use_container_width=True)
-
         fig2, ax2 = plt.subplots(figsize=(6, 4))
         ax2.bar(stats["speaker"], stats["total_time"],
                 color=cm.tab10(np.linspace(0, 1, len(stats))))
@@ -478,9 +539,44 @@ if st.session_state.diar_done and st.session_state.diar_df is not None:
         st.pyplot(fig2)
         plt.close(fig2)
 
+    with tab4:
+        tt        = st.session_state.get("diar_transcript_text")
+        segs      = st.session_state.get("diar_transcript_segments")
+        seg_texts = st.session_state.get("diar_segment_texts")
+
+        if not tt:
+            st.info("Enable **Transcribe audio** in the sidebar and re-run to see the transcript.")
+        else:
+            st.subheader("Full transcript")
+            st.write(tt)
+            st.download_button(
+                "⬇ Download full transcript (.txt)", data=tt.encode(),
+                file_name=f"{st.session_state.diar_file_name}.txt", mime="text/plain",
+            )
+
+            if segs:
+                with st.expander("📄 Raw Whisper segments"):
+                    st.dataframe(
+                        pd.DataFrame(segs).style.format({"start": "{:.3f}", "end": "{:.3f}"}),
+                        use_container_width=True,
+                    )
+
+            if seg_texts is not None and not seg_texts.empty:
+                st.subheader("Speaker-aligned transcript")
+                st.dataframe(
+                    seg_texts.style.format(
+                        {"start": "{:.3f}", "end": "{:.3f}", "duration": "{:.3f}"}
+                    ),
+                    use_container_width=True,
+                )
+                st.download_button(
+                    "⬇ Download speaker-aligned transcript (.csv)",
+                    data=seg_texts.to_csv(index=False).encode(),
+                    file_name=f"{st.session_state.diar_file_name}.diar_transcript.csv",
+                    mime="text/csv",
+                )
+
     st.download_button(
-        "⬇ Download RTTM",
-        data=st.session_state.diar_rttm.encode(),
-        file_name=f"{st.session_state.diar_file_name}.rttm",
-        mime="text/plain",
+        "⬇ Download RTTM", data=st.session_state.diar_rttm.encode(),
+        file_name=f"{st.session_state.diar_file_name}.rttm", mime="text/plain",
     )
