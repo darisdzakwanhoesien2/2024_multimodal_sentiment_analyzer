@@ -6,6 +6,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import numpy as np
+import shutil
+import subprocess
 
 # ── optional import ───────────────────────────────────────────────────────────
 Pipeline = None
@@ -337,7 +339,7 @@ def speaker_stats(df: pd.DataFrame) -> pd.DataFrame:
 # ── main ──────────────────────────────────────────────────────────────────────
 uploaded = st.file_uploader(
     "Upload audio file",
-    type=["wav", "mp3", "m4a", "flac", "ogg"],
+    type=["wav", "mp3", "m4a", "flac", "ogg", "mp4"],
     help="Mono or stereo audio. Long files (>30 min) may take several minutes.",
 )
 
@@ -363,11 +365,41 @@ if run_btn and uploaded:
     st.session_state.diar_rttm  = ""
 
     tmp_path = None
+    tmp_audio_path = None
     try:
         suffix = os.path.splitext(uploaded.name)[1] or ".wav"
         with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
             tmp.write(uploaded.getbuffer())
             tmp_path = tmp.name
+        orig_tmp_path = tmp_path
+
+        # If user uploaded an MP4 (video), extract audio with ffmpeg -> WAV
+        video_exts = {".mp4", ".mkv", ".mov", ".avi"}
+        if suffix.lower() in video_exts:
+            if shutil.which("ffmpeg") is None:
+                st.warning("ffmpeg not found. Install it on macOS with: brew install ffmpeg")
+            else:
+                try:
+                    tmp_audio = tempfile.NamedTemporaryFile(suffix=".wav", delete=False)
+                    tmp_audio_path = tmp_audio.name
+                    tmp_audio.close()
+                    cmd = [
+                        "ffmpeg", "-y", "-i", orig_tmp_path,
+                        "-vn",            # no video
+                        "-ac", "1",      # mono
+                        "-ar", "16000",  # sample rate (optional; run_diarization will resample if needed)
+                        tmp_audio_path,
+                    ]
+                    subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+                    tmp_path = tmp_audio_path  # use converted audio for processing
+                except subprocess.CalledProcessError as e:
+                    st.warning(f"⚠️ ffmpeg conversion failed: {e}. Using original uploaded file.")
+                    if tmp_audio_path and os.path.exists(tmp_audio_path):
+                        try:
+                            os.remove(tmp_audio_path)
+                        except OSError:
+                            pass
+                    tmp_audio_path = None
 
         # load pipeline
         with st.status("Loading pipeline…", expanded=True) as status:
@@ -395,11 +427,13 @@ if run_btn and uploaded:
     except Exception as e:
         st.session_state.diar_error = str(e)
     finally:
-        if tmp_path and os.path.exists(tmp_path):
-            try:
-                os.remove(tmp_path)
-            except OSError:
-                pass
+        # clean up original upload + possible converted audio
+        for p in (locals().get("orig_tmp_path"), locals().get("tmp_audio_path")):
+            if p and os.path.exists(p):
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
 
 # ── render results (persists across reruns) ───────────────────────────────────
 if st.session_state.diar_error:
