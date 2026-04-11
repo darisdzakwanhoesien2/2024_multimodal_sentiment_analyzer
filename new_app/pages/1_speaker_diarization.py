@@ -166,8 +166,112 @@ def run_diarization(pipeline, audio_path: str, num_spk: int, min_spk: int, max_s
             except OSError:
                 pass
 
+    # ── compatibility: support both Annotation.itertracks and DiarizeOutput-like ─
+    def _iter_diarization(diar):
+        def _seg_obj(s):
+            # return an object with .start and .end
+            if hasattr(s, "start") and hasattr(s, "end"):
+                return s
+            if isinstance(s, (list, tuple)) and len(s) >= 2:
+                start, end = float(s[0]), float(s[1])
+                return type("Seg", (), {"start": start, "end": end})()
+            raise TypeError("Unsupported segment type")
+
+        # pyannote.core.Annotation-like
+        if hasattr(diar, "itertracks"):
+            yield from diar.itertracks(yield_label=True)
+            return
+
+        # DiarizeOutput-like: common attributes
+        segs = getattr(diar, "segments", None) or getattr(diar, "segments_", None)
+        labs = getattr(diar, "labels", None) or getattr(diar, "labels_", None)
+        if segs is not None and labs is not None:
+            for s, l in zip(segs, labs):
+                yield _seg_obj(s), None, l
+            return
+
+        # get_timeline() + labels()
+        get_tl = getattr(diar, "get_timeline", None)
+        if callable(get_tl):
+            try:
+                tl = get_tl()
+                if hasattr(tl, "__iter__"):
+                    # try paired labels first
+                    labs = getattr(diar, "labels", None) or getattr(diar, "labels_", None)
+                    if labs is not None:
+                        for s, l in zip(tl, labs):
+                            yield _seg_obj(s), None, l
+                        return
+                    # fallback: timeline may yield (segment, label) pairs
+                    for item in tl:
+                        if isinstance(item, (list, tuple)) and len(item) >= 2:
+                            s, l = item[0], item[1]
+                            yield _seg_obj(s), None, l
+                    return
+            except Exception:
+                pass
+
+        # iterable of (segment, label) or (segment, _, label)
+        if isinstance(diar, (list, tuple)):
+            for item in diar:
+                if isinstance(item, (list, tuple)):
+                    if len(item) == 2:
+                        s, l = item
+                        yield _seg_obj(s), None, l
+                    elif len(item) >= 3:
+                        yield _seg_obj(item[0]), None, item[-1]
+            return
+
+        # dict-like wrappers
+        if isinstance(diar, dict):
+            for key in ("annotation", "diarization", "output", "result"):
+                if key in diar:
+                    yield from _iter_diarization(diar[key])
+                    return
+
+        # Inspect object's attributes / dataclass internals for lists/pairs
+        try:
+            attrs = getattr(diar, "__dict__", None)
+            if isinstance(attrs, dict):
+                # look for an attribute that is list/tuple of (segment, label) pairs
+                for name, val in attrs.items():
+                    if name.startswith("_"):
+                        continue
+                    if hasattr(val, "itertracks"):
+                        yield from val.itertracks(yield_label=True)
+                        return
+                    if isinstance(val, (list, tuple)) and val:
+                        first = val[0]
+                        # list of (segment, label) pairs
+                        if isinstance(first, (list, tuple)) and len(first) >= 2:
+                            for item in val:
+                                if isinstance(item, (list, tuple)) and len(item) >= 2:
+                                    yield _seg_obj(item[0]), None, item[1]
+                            return
+                        # list of segments + separate labels attribute
+                        for label_key in ("labels", "labels_", "speakers", "speaker_labels"):
+                            lbls = attrs.get(label_key)
+                            if isinstance(lbls, (list, tuple)) and len(lbls) == len(val):
+                                for s, l in zip(val, lbls):
+                                    yield _seg_obj(s), None, l
+                                return
+                        # list of segment-like objects only -> try to extract speaker field per item
+                        if hasattr(first, "start") and hasattr(first, "end"):
+                            for s in val:
+                                label = getattr(s, "label", None) or getattr(s, "speaker", None) or "SPEAKER_0"
+                                yield _seg_obj(s), None, label
+                            return
+        except Exception:
+            pass
+
+        # last attempt: attributes that look like pairs (informative failure)
+        raise RuntimeError(
+            f"Unsupported diarization output (type={type(diar)}). "
+            "No 'itertracks', nor matching 'segments'/'labels', nor iterable pairs found."
+        )
+
     rows = []
-    for segment, _, label in diarization.itertracks(yield_label=True):
+    for segment, _, label in _iter_diarization(diarization):
         rows.append({
             "start":    round(float(segment.start), 3),
             "end":      round(float(segment.end),   3),
@@ -178,7 +282,7 @@ def run_diarization(pipeline, audio_path: str, num_spk: int, min_spk: int, max_s
 
     # build RTTM in-memory
     rttm_lines = []
-    for segment, _, label in diarization.itertracks(yield_label=True):
+    for segment, _, label in _iter_diarization(diarization):
         rttm_lines.append(
             f"SPEAKER file 1 {segment.start:.3f} "
             f"{(segment.end - segment.start):.3f} "
