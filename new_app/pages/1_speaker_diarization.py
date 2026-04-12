@@ -1,3 +1,4 @@
+from pathlib import Path
 import os
 import io
 import tempfile
@@ -29,6 +30,18 @@ if Pipeline is None:
         + (f"Import error: `{_import_error}`" if _import_error else "")
     )
     st.stop()
+
+# --- Added: allow selecting existing files from project downloads ---
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
+DOWNLOADS_DIR = PROJECT_ROOT / "downloads"
+DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
+
+AUDIO_VIDEO_EXTS = {
+    ".wav", ".mp3", ".m4a", ".flac", ".ogg", ".mp4", ".mkv", ".mov", ".avi"
+}
+existing_files = sorted(
+    [p.name for p in DOWNLOADS_DIR.iterdir() if p.is_file() and p.suffix.lower() in AUDIO_VIDEO_EXTS]
+)
 
 # ── session state defaults ────────────────────────────────────────────────────
 defaults = {
@@ -383,9 +396,22 @@ def speaker_stats(df: pd.DataFrame) -> pd.DataFrame:
 # ── main ──────────────────────────────────────────────────────────────────────
 uploaded = st.file_uploader(
     "Upload audio / video file",
-    type=["wav", "mp3", "m4a", "flac", "ogg", "mp4", "mkv", "mov"],
+    type=["wav", "mp3", "m4a", "flac", "ogg", "mp4", "mkv", "mov", "avi"],
     help="Mono or stereo. Long files (>30 min) may take several minutes.",
 )
+
+# --- Added: option to pick an existing file from the project's downloads folder ---
+selected_existing = None
+if existing_files:
+    selected_existing = st.selectbox("Or choose an existing file from downloads", [""] + existing_files)
+    if selected_existing:
+        sel_path = DOWNLOADS_DIR / selected_existing
+        st.write(f"Selected: {selected_existing}")
+        # preview audio or video depending on extension
+        if sel_path.suffix.lower() in {".mp4", ".mkv", ".mov", ".avi"}:
+            st.video(str(sel_path))
+        else:
+            st.audio(str(sel_path))
 
 if uploaded:
     st.audio(uploaded)
@@ -394,9 +420,10 @@ if uploaded:
             st.session_state[k] = defaults[k]
         st.session_state.diar_file_name = uploaded.name
 
-run_btn = st.button("▶ Run Diarization", type="primary", disabled=(uploaded is None))
+# allow running when either an upload exists or an existing file is chosen
+run_btn = st.button("▶ Run Diarization", type="primary", disabled=(uploaded is None and not selected_existing))
 
-if run_btn and uploaded:
+if run_btn and (uploaded or selected_existing):
     if not hf_token:
         st.error("❌ Please enter your Hugging Face token in the sidebar.")
         st.stop()
@@ -413,10 +440,21 @@ if run_btn and uploaded:
     tmp_audio_path = None
 
     try:
-        suffix = os.path.splitext(uploaded.name)[1].lower() or ".wav"
-        with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
-            tmp.write(uploaded.getbuffer())
-            orig_tmp_path = tmp.name
+        # If user chose an existing file, copy it to a temp file for processing.
+        if selected_existing and not uploaded:
+            selected_path = DOWNLOADS_DIR / selected_existing
+            suffix = selected_path.suffix.lower() or ".wav"
+            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+                tmp.write(selected_path.read_bytes())
+                orig_tmp_path = tmp.name
+            # preserve filename for downloads/outputs
+            st.session_state.diar_file_name = selected_existing
+        else:
+            suffix = os.path.splitext(uploaded.name)[1].lower() or ".wav"
+            with tempfile.NamedTemporaryFile(suffix=suffix, delete=False) as tmp:
+                tmp.write(uploaded.getbuffer())
+                orig_tmp_path = tmp.name
+            st.session_state.diar_file_name = uploaded.name
 
         tmp_path = orig_tmp_path
 
