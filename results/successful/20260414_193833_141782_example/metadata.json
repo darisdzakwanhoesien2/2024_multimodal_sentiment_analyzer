@@ -1,0 +1,98 @@
+{
+  "source": "example",
+  "timestamp": "20260414_193833_141782",
+  "successful": true,
+  "total_detections": 3,
+  "enrichments": [
+    {
+      "index": 1,
+      "yolo_class": "bottle",
+      "confidence": 0.941,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 'list' object has no attribute 'lower'",
+      "matches": []
+    },
+    {
+      "index": 2,
+      "yolo_class": "bottle",
+      "confidence": 0.899,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 'list' object has no attribute 'lower'",
+      "matches": []
+    },
+    {
+      "index": 3,
+      "yolo_class": "bottle",
+      "confidence": 0.891,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 'list' object has no attribute 'lower'",
+      "matches": []
+    },
+    {
+      "index": 4,
+      "yolo_class": "bottle",
+      "confidence": 0.816,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 404 Client Error: Not Found for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 5,
+      "yolo_class": "book",
+      "confidence": 0.753,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 6,
+      "yolo_class": "book",
+      "confidence": 0.753,
+      "product_name": "Nori Maki Arare",
+      "matches_found": 0,
+      "raw_reply": "product_name: Nori Maki Arare\n",
+      "matches": []
+    },
+    {
+      "index": 7,
+      "yolo_class": "book",
+      "confidence": 0.652,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 504 Server Error: Gateway Timeout for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 8,
+      "yolo_class": "book",
+      "confidence": 0.643,
+      "product_name": "Nishiki",
+      "matches_found": 0,
+      "raw_reply": "product_name: Nishiki",
+      "matches": []
+    },
+    {
+      "index": 9,
+      "yolo_class": "book",
+      "confidence": 0.639,
+      "product_name": "Panko",
+      "matches_found": 0,
+      "raw_reply": "product_name: Panko",
+      "matches": []
+    },
+    {
+      "index": 10,
+      "yolo_class": "cup",
+      "confidence": 0.63,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 'list' object has no attribute 'lower'",
+      "matches": []
+    }
+  ]
+}
