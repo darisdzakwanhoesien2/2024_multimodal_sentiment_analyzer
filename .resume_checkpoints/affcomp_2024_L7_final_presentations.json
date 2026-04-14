@@ -1,0 +1,815 @@
+{
+  "last_timestamp": 2341.6,
+  "slides": [
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_0.80s_score0.347.jpg",
+      "timestamp": 0.8,
+      "score": 0.3467,
+      "frame_index": 20,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_16.00s_score0.328.jpg",
+      "timestamp": 16.0,
+      "score": 0.3282,
+      "frame_index": 400,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_17.20s_score0.329.jpg",
+      "timestamp": 17.2,
+      "score": 0.3293,
+      "frame_index": 430,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_60.00s_score0.094.jpg",
+      "timestamp": 60.0,
+      "score": 0.0943,
+      "frame_index": 1500,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_61.20s_score0.090.jpg",
+      "timestamp": 61.2,
+      "score": 0.0903,
+      "frame_index": 1530,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_65.20s_score0.085.jpg",
+      "timestamp": 65.2,
+      "score": 0.085,
+      "frame_index": 1630,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_98.00s_score0.325.jpg",
+      "timestamp": 98.0,
+      "score": 0.3249,
+      "frame_index": 2450,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_101.20s_score0.325.jpg",
+      "timestamp": 101.2,
+      "score": 0.3249,
+      "frame_index": 2530,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_107.20s_score0.325.jpg",
+      "timestamp": 107.2,
+      "score": 0.3248,
+      "frame_index": 2680,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_110.80s_score0.538.jpg",
+      "timestamp": 110.8,
+      "score": 0.5378,
+      "frame_index": 2770,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_112.00s_score0.327.jpg",
+      "timestamp": 112.0,
+      "score": 0.327,
+      "frame_index": 2800,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_116.40s_score0.854.jpg",
+      "timestamp": 116.4,
+      "score": 0.8539,
+      "frame_index": 2910,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_197.20s_score0.229.jpg",
+      "timestamp": 197.2,
+      "score": 0.229,
+      "frame_index": 4930,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_198.80s_score0.400.jpg",
+      "timestamp": 198.8,
+      "score": 0.3998,
+      "frame_index": 4970,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_346.40s_score0.146.jpg",
+      "timestamp": 346.4,
+      "score": 0.1458,
+      "frame_index": 8660,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_356.40s_score0.221.jpg",
+      "timestamp": 356.4,
+      "score": 0.2214,
+      "frame_index": 8910,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_378.00s_score0.357.jpg",
+      "timestamp": 378.0,
+      "score": 0.3567,
+      "frame_index": 9450,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_382.00s_score0.357.jpg",
+      "timestamp": 382.0,
+      "score": 0.3566,
+      "frame_index": 9550,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_394.80s_score0.465.jpg",
+      "timestamp": 394.8,
+      "score": 0.465,
+      "frame_index": 9870,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_396.40s_score0.093.jpg",
+      "timestamp": 396.4,
+      "score": 0.0928,
+      "frame_index": 9910,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_546.00s_score0.162.jpg",
+      "timestamp": 546.0,
+      "score": 0.1618,
+      "frame_index": 13650,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_548.00s_score0.199.jpg",
+      "timestamp": 548.0,
+      "score": 0.1988,
+      "frame_index": 13700,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_594.40s_score0.356.jpg",
+      "timestamp": 594.4,
+      "score": 0.3563,
+      "frame_index": 14860,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_665.20s_score0.083.jpg",
+      "timestamp": 665.2,
+      "score": 0.0826,
+      "frame_index": 16630,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_708.40s_score0.381.jpg",
+      "timestamp": 708.4,
+      "score": 0.3808,
+      "frame_index": 17710,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_711.20s_score0.372.jpg",
+      "timestamp": 711.2,
+      "score": 0.3716,
+      "frame_index": 17780,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_816.00s_score0.415.jpg",
+      "timestamp": 816.0,
+      "score": 0.4153,
+      "frame_index": 20400,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_833.20s_score0.390.jpg",
+      "timestamp": 833.2,
+      "score": 0.3898,
+      "frame_index": 20830,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_864.00s_score0.162.jpg",
+      "timestamp": 864.0,
+      "score": 0.1622,
+      "frame_index": 21600,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_868.00s_score0.564.jpg",
+      "timestamp": 868.0,
+      "score": 0.5639,
+      "frame_index": 21700,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_898.80s_score0.099.jpg",
+      "timestamp": 898.8,
+      "score": 0.099,
+      "frame_index": 22470,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_966.00s_score0.308.jpg",
+      "timestamp": 966.0,
+      "score": 0.3077,
+      "frame_index": 24150,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_969.60s_score0.227.jpg",
+      "timestamp": 969.6,
+      "score": 0.2269,
+      "frame_index": 24240,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_970.80s_score0.245.jpg",
+      "timestamp": 970.8,
+      "score": 0.2453,
+      "frame_index": 24270,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_981.60s_score0.277.jpg",
+      "timestamp": 981.6,
+      "score": 0.2767,
+      "frame_index": 24540,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_986.80s_score0.238.jpg",
+      "timestamp": 986.8,
+      "score": 0.2382,
+      "frame_index": 24670,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_992.80s_score0.255.jpg",
+      "timestamp": 992.8,
+      "score": 0.2555,
+      "frame_index": 24820,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1006.00s_score0.240.jpg",
+      "timestamp": 1006.0,
+      "score": 0.2395,
+      "frame_index": 25150,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1045.60s_score0.095.jpg",
+      "timestamp": 1045.6,
+      "score": 0.0947,
+      "frame_index": 26140,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1066.80s_score0.381.jpg",
+      "timestamp": 1066.8,
+      "score": 0.3808,
+      "frame_index": 26670,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1091.60s_score0.276.jpg",
+      "timestamp": 1091.6,
+      "score": 0.2763,
+      "frame_index": 27290,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1105.20s_score0.154.jpg",
+      "timestamp": 1105.2,
+      "score": 0.1539,
+      "frame_index": 27630,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1131.60s_score0.174.jpg",
+      "timestamp": 1131.6,
+      "score": 0.1744,
+      "frame_index": 28290,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1138.40s_score0.195.jpg",
+      "timestamp": 1138.4,
+      "score": 0.1953,
+      "frame_index": 28460,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1141.20s_score0.132.jpg",
+      "timestamp": 1141.2,
+      "score": 0.1318,
+      "frame_index": 28530,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1164.80s_score0.164.jpg",
+      "timestamp": 1164.8,
+      "score": 0.1641,
+      "frame_index": 29120,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1191.20s_score0.661.jpg",
+      "timestamp": 1191.2,
+      "score": 0.6614,
+      "frame_index": 29780,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1289.20s_score0.162.jpg",
+      "timestamp": 1289.2,
+      "score": 0.1622,
+      "frame_index": 32230,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1304.40s_score0.432.jpg",
+      "timestamp": 1304.4,
+      "score": 0.4323,
+      "frame_index": 32610,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1322.80s_score0.162.jpg",
+      "timestamp": 1322.8,
+      "score": 0.1622,
+      "frame_index": 33070,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1324.40s_score0.198.jpg",
+      "timestamp": 1324.4,
+      "score": 0.1983,
+      "frame_index": 33110,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1326.40s_score0.326.jpg",
+      "timestamp": 1326.4,
+      "score": 0.3262,
+      "frame_index": 33160,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1328.40s_score0.110.jpg",
+      "timestamp": 1328.4,
+      "score": 0.1101,
+      "frame_index": 33210,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1340.80s_score0.110.jpg",
+      "timestamp": 1340.8,
+      "score": 0.1101,
+      "frame_index": 33520,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1420.40s_score0.153.jpg",
+      "timestamp": 1420.4,
+      "score": 0.1534,
+      "frame_index": 35510,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1430.40s_score0.164.jpg",
+      "timestamp": 1430.4,
+      "score": 0.1643,
+      "frame_index": 35760,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1480.80s_score0.143.jpg",
+      "timestamp": 1480.8,
+      "score": 0.1427,
+      "frame_index": 37020,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1514.00s_score0.311.jpg",
+      "timestamp": 1514.0,
+      "score": 0.311,
+      "frame_index": 37850,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1538.00s_score0.321.jpg",
+      "timestamp": 1538.0,
+      "score": 0.3206,
+      "frame_index": 38450,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1570.80s_score0.323.jpg",
+      "timestamp": 1570.8,
+      "score": 0.3228,
+      "frame_index": 39270,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1578.80s_score0.306.jpg",
+      "timestamp": 1578.8,
+      "score": 0.3058,
+      "frame_index": 39470,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1588.00s_score0.586.jpg",
+      "timestamp": 1588.0,
+      "score": 0.5859,
+      "frame_index": 39700,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1654.80s_score0.162.jpg",
+      "timestamp": 1654.8,
+      "score": 0.1622,
+      "frame_index": 41370,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1670.00s_score0.283.jpg",
+      "timestamp": 1670.0,
+      "score": 0.2828,
+      "frame_index": 41750,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1714.80s_score0.400.jpg",
+      "timestamp": 1714.8,
+      "score": 0.4002,
+      "frame_index": 42870,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1746.80s_score0.133.jpg",
+      "timestamp": 1746.8,
+      "score": 0.133,
+      "frame_index": 43670,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1775.20s_score0.325.jpg",
+      "timestamp": 1775.2,
+      "score": 0.3254,
+      "frame_index": 44380,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1804.40s_score0.222.jpg",
+      "timestamp": 1804.4,
+      "score": 0.2223,
+      "frame_index": 45110,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1810.40s_score0.763.jpg",
+      "timestamp": 1810.4,
+      "score": 0.7629,
+      "frame_index": 45260,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1875.60s_score0.162.jpg",
+      "timestamp": 1875.6,
+      "score": 0.1621,
+      "frame_index": 46890,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1876.80s_score0.303.jpg",
+      "timestamp": 1876.8,
+      "score": 0.3027,
+      "frame_index": 46920,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1880.40s_score0.150.jpg",
+      "timestamp": 1880.4,
+      "score": 0.1503,
+      "frame_index": 47010,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1912.00s_score0.092.jpg",
+      "timestamp": 1912.0,
+      "score": 0.0921,
+      "frame_index": 47800,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1919.20s_score0.115.jpg",
+      "timestamp": 1919.2,
+      "score": 0.1146,
+      "frame_index": 47980,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_1944.00s_score0.149.jpg",
+      "timestamp": 1944.0,
+      "score": 0.1488,
+      "frame_index": 48600,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2040.40s_score0.095.jpg",
+      "timestamp": 2040.4,
+      "score": 0.0949,
+      "frame_index": 51010,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2077.20s_score0.162.jpg",
+      "timestamp": 2077.2,
+      "score": 0.1624,
+      "frame_index": 51930,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2102.40s_score0.145.jpg",
+      "timestamp": 2102.4,
+      "score": 0.1446,
+      "frame_index": 52560,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2115.60s_score0.130.jpg",
+      "timestamp": 2115.6,
+      "score": 0.1303,
+      "frame_index": 52890,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2162.80s_score0.101.jpg",
+      "timestamp": 2162.8,
+      "score": 0.1007,
+      "frame_index": 54070,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2174.40s_score0.338.jpg",
+      "timestamp": 2174.4,
+      "score": 0.338,
+      "frame_index": 54360,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2180.80s_score0.122.jpg",
+      "timestamp": 2180.8,
+      "score": 0.1216,
+      "frame_index": 54520,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2184.40s_score0.162.jpg",
+      "timestamp": 2184.4,
+      "score": 0.1621,
+      "frame_index": 54610,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2185.60s_score0.107.jpg",
+      "timestamp": 2185.6,
+      "score": 0.107,
+      "frame_index": 54640,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2187.20s_score0.352.jpg",
+      "timestamp": 2187.2,
+      "score": 0.3518,
+      "frame_index": 54680,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2208.80s_score0.162.jpg",
+      "timestamp": 2208.8,
+      "score": 0.1616,
+      "frame_index": 55220,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2210.00s_score0.102.jpg",
+      "timestamp": 2210.0,
+      "score": 0.1023,
+      "frame_index": 55250,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2249.60s_score0.114.jpg",
+      "timestamp": 2249.6,
+      "score": 0.1139,
+      "frame_index": 56240,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2277.60s_score0.091.jpg",
+      "timestamp": 2277.6,
+      "score": 0.0906,
+      "frame_index": 56940,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    },
+    {
+      "frame": "/Users/darisdzakwanhoesien/Documents/project_documentation/codebase/computer_vision/multimodal/extracted_slides/affcomp_2024_L7_final_presentations/slide_2341.60s_score0.085.jpg",
+      "timestamp": 2341.6,
+      "score": 0.085,
+      "frame_index": 58540,
+      "total_frames": 251305,
+      "duration_s": 10052.2,
+      "fps": 25.0
+    }
+  ]
+}
