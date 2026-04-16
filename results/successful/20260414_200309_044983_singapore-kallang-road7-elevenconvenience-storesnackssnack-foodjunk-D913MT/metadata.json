@@ -1,0 +1,98 @@
+{
+  "source": "singapore-kallang-road7-elevenconvenience-storesnackssnack-foodjunk-D913MT",
+  "timestamp": "20260414_200309_044983",
+  "successful": true,
+  "total_detections": 1,
+  "enrichments": [
+    {
+      "index": 1,
+      "yolo_class": "cup",
+      "confidence": 0.856,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 2,
+      "yolo_class": "toothbrush",
+      "confidence": 0.418,
+      "product_name": "Pocky",
+      "matches_found": 0,
+      "raw_reply": "product_name: Pocky",
+      "matches": []
+    },
+    {
+      "index": 3,
+      "yolo_class": "toothbrush",
+      "confidence": 0.388,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 4,
+      "yolo_class": "toothbrush",
+      "confidence": 0.295,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 5,
+      "yolo_class": "vase",
+      "confidence": 0.29,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 6,
+      "yolo_class": "cup",
+      "confidence": 0.288,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 7,
+      "yolo_class": "cup",
+      "confidence": 0.288,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 8,
+      "yolo_class": "toothbrush",
+      "confidence": 0.28,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 9,
+      "yolo_class": "scissors",
+      "confidence": 0.263,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 429 Client Error: Too Many Requests for url: https://openrouter.ai/api/v1/chat/completions",
+      "matches": []
+    },
+    {
+      "index": 10,
+      "yolo_class": "cup",
+      "confidence": 0.229,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 'list' object has no attribute 'lower'",
+      "matches": []
+    }
+  ]
+}

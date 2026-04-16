@@ -292,13 +292,68 @@ def build_user_message_content(text: str, image_parts: list[dict] | None = None)
 
 
 def call_openrouter(messages, model, api_key, temperature=0.1) -> str:
-    headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json",
-               "HTTP-Referer": "https://pear-edtech.app", "X-Title": "Pear EdTech Chatbot"}
-    resp = requests.post(OPENROUTER_API_URL, headers=headers,
-                         json={"model": model, "messages": messages, "temperature": temperature},
-                         timeout=90)
-    resp.raise_for_status()
-    return resp.json()["choices"][0]["message"]["content"]
+    """
+    Call OpenRouter with automatic retry on 429 (rate-limit) and
+    clear error messages on 404 (model not found).
+    """
+    headers = {
+        "Authorization":  f"Bearer {api_key}",
+        "Content-Type":   "application/json",
+        "HTTP-Referer":   "https://pear-edtech.app",
+        "X-Title":        "Pear EdTech Chatbot",
+    }
+    payload = {"model": model, "messages": messages, "temperature": temperature}
+
+    max_retries  = 3
+    base_delay   = 2.0   # seconds
+
+    for attempt in range(1, max_retries + 1):
+        try:
+            resp = requests.post(
+                OPENROUTER_API_URL, headers=headers,
+                json=payload, timeout=90,
+            )
+
+            if resp.status_code == 429:
+                # Respect Retry-After header if present, else exponential back-off
+                retry_after = float(resp.headers.get("Retry-After", base_delay * (2 ** (attempt - 1))))
+                if attempt < max_retries:
+                    time.sleep(retry_after)
+                    continue
+                else:
+                    resp.raise_for_status()   # raise after final attempt
+
+            if resp.status_code == 404:
+                raise ValueError(
+                    f"Model '{model}' not found on OpenRouter (404). "
+                    "Please select a different model in the sidebar."
+                )
+
+            resp.raise_for_status()
+
+            # ── Parse response safely ─────────────────────────────────────────
+            data    = resp.json()
+            choice  = data["choices"][0]
+            content = choice["message"]["content"]
+
+            # content can be a str or a list of parts — normalise here too
+            if isinstance(content, list):
+                parts = [
+                    p.get("text", "") if isinstance(p, dict) else str(p)
+                    for p in content
+                ]
+                return " ".join(p for p in parts if p).strip()
+
+            return str(content)
+
+        except (requests.exceptions.ConnectionError,
+                requests.exceptions.Timeout) as exc:
+            if attempt < max_retries:
+                time.sleep(base_delay * attempt)
+                continue
+            raise exc
+
+    raise RuntimeError("call_openrouter: exhausted all retries.")
 
 
 def pil_to_base64(image: Image.Image, image_format="JPEG") -> tuple[str, str]:
@@ -316,11 +371,36 @@ def extract_product_crop(image: Image.Image, box: np.ndarray, padding_ratio=0.08
                        min(w,int(x2)+px), min(h,int(y2)+py)))
 
 
-def extract_product_name(raw_reply: str) -> str:
-    text  = raw_reply.strip()
+def extract_product_name(raw_reply) -> str:
+    """
+    Safely extract a plain product name string from the Vision LM reply.
+    Handles: plain str, list of content parts (OpenAI/OpenRouter multipart),
+    dict with 'text' key, or anything else.
+    """
+    # ── Normalise to plain string first ───────────────────────────────────────
+    if isinstance(raw_reply, list):
+        # OpenAI-style content parts: [{"type": "text", "text": "..."}, ...]
+        parts = []
+        for part in raw_reply:
+            if isinstance(part, dict):
+                parts.append(str(part.get("text", "") or part.get("content", "")))
+            else:
+                parts.append(str(part))
+        text = " ".join(p for p in parts if p).strip()
+    elif isinstance(raw_reply, dict):
+        text = str(raw_reply.get("text", "") or raw_reply.get("content", "") or raw_reply).strip()
+    else:
+        text = str(raw_reply).strip()
+
+    if not text:
+        return ""
+
+    # ── Pull out product_name: <value> if present ─────────────────────────────
     match = re.search(r"product_name\s*[:=]\s*(.+)", text, re.IGNORECASE)
-    if match: text = match.group(1).strip()
-    text  = re.sub(r"^[-*\s]+", "", text)
+    if match:
+        text = match.group(1).strip()
+
+    text = re.sub(r"^[-*\s]+", "", text)
     return re.sub(r"[\r\n]+", " ", text).strip(" '\"`")
 
 
@@ -331,10 +411,12 @@ def identify_product_name(crop, model_id, api_key, yolo_label) -> tuple[str, str
         "Return only the most likely market-facing product name. "
         "Output format: product_name: <answer>"
     )
-    messages = [{"role":"user","content":build_user_message_content(
+    messages = [{"role": "user", "content": build_user_message_content(
         prompt, [build_image_content_part(b64, mime)])}]
-    reply = call_openrouter(messages, model=model_id, api_key=api_key, temperature=0.0)
-    return extract_product_name(reply), reply
+
+    # raw_reply is now guaranteed to be a plain str from call_openrouter
+    raw_reply = call_openrouter(messages, model=model_id, api_key=api_key, temperature=0.0)
+    return extract_product_name(raw_reply), raw_reply
 
 # ══════════════════════════════════════════════════════════════════════════════
 # OPENFOODFACTS
@@ -458,53 +540,76 @@ def run_detection_pipeline(
             elif not selected_vision_model:
                 st.warning("No vision model selected.")
             else:
-                st.subheader("Vision LM + OpenFoodFacts")
-                top_indices = ordered_indices[:min(max_products_to_enrich, len(ordered_indices))]
-                progress    = st.progress(0.0)
+                # ── Guard: warn if model id looks invalid ─────────────────────
+                model_id = selected_vision_model.get("id", "")
+                if not model_id or "/" not in model_id:
+                    st.error(
+                        f"⚠️ Selected model id `{model_id!r}` looks invalid. "
+                        "Pick a valid model from the sidebar (format: `provider/model-name`)."
+                    )
+                else:
+                    st.subheader("Vision LM + OpenFoodFacts")
+                    st.caption(f"Using model: `{model_id}`")
+                    top_indices = ordered_indices[:min(max_products_to_enrich, len(ordered_indices))]
+                    progress    = st.progress(0.0)
 
-                for step, idx in enumerate(top_indices, 1):
-                    crop       = extract_product_crop(image, boxes[idx])
-                    class_name = model.names[int(classes[idx])]
-                    confidence = float(scores[idx])
-                    try:
-                        product_name, raw_reply = identify_product_name(
-                            crop, selected_vision_model["id"], effective_key, class_name)
-                        matches = search_openfoodfacts(
-                            product_name, max_results=openfoodfacts_results,
-                            max_scan=openfoodfacts_scan_limit)
-                        enrichment_rows.append({
-                            "index": int(idx)+1, "yolo_class": class_name,
-                            "confidence": round(confidence, 3),
-                            "product_name": product_name, "matches_found": len(matches),
-                            "raw_reply": raw_reply, "matches": matches, "crop": crop,
-                        })
-                    except Exception as exc:
-                        enrichment_rows.append({
-                            "index": int(idx)+1, "yolo_class": class_name,
-                            "confidence": round(confidence, 3),
-                            "product_name": "", "matches_found": 0,
-                            "raw_reply": f"Error: {exc}", "matches": [], "crop": crop,
-                        })
-                    progress.progress(step / len(top_indices))
+                    for step, idx in enumerate(top_indices, 1):
+                        crop       = extract_product_crop(image, boxes[idx])
+                        class_name = model.names[int(classes[idx])]
+                        confidence = float(scores[idx])
+                        try:
+                            product_name, raw_reply = identify_product_name(
+                                crop, model_id, effective_key, class_name)
+                            matches = search_openfoodfacts(
+                                product_name, max_results=openfoodfacts_results,
+                                max_scan=openfoodfacts_scan_limit)
+                            enrichment_rows.append({
+                                "index": int(idx)+1, "yolo_class": class_name,
+                                "confidence": round(confidence, 3),
+                                "product_name": product_name,
+                                "matches_found": len(matches),
+                                "raw_reply": raw_reply,
+                                "matches": matches,
+                                "crop": crop,
+                            })
+                        except ValueError as exc:
+                            # 404 model-not-found — stop enriching, show once
+                            st.error(str(exc))
+                            enrichment_rows.append({
+                                "index": int(idx)+1, "yolo_class": class_name,
+                                "confidence": round(confidence, 3),
+                                "product_name": "", "matches_found": 0,
+                                "raw_reply": f"Stopped: {exc}", "matches": [], "crop": crop,
+                            })
+                            break   # no point retrying other crops with invalid model
+                        except Exception as exc:
+                            enrichment_rows.append({
+                                "index": int(idx)+1, "yolo_class": class_name,
+                                "confidence": round(confidence, 3),
+                                "product_name": "", "matches_found": 0,
+                                "raw_reply": f"Error: {exc}", "matches": [], "crop": crop,
+                            })
+                        progress.progress(step / len(top_indices))
 
-                st.dataframe([{
-                    "detection": r["index"], "yolo_class": r["yolo_class"],
-                    "confidence": r["confidence"],
-                    "vision_product_name": r["product_name"],
-                    "openfoodfacts_matches": r["matches_found"],
-                } for r in enrichment_rows], use_container_width=True)
+                    if enrichment_rows:
+                        st.dataframe([{
+                            "detection": r["index"], "yolo_class": r["yolo_class"],
+                            "confidence": r["confidence"],
+                            "vision_product_name": r["product_name"],
+                            "openfoodfacts_matches": r["matches_found"],
+                        } for r in enrichment_rows], use_container_width=True)
 
-                for row in enrichment_rows:
-                    with st.expander(
-                        f"Det {row['index']} | {row['yolo_class']} | {row['product_name'] or 'no name'}",
-                        expanded=False):
-                        st.image(row["crop"], caption=f"Crop {row['index']}", width=220)
-                        st.caption(f"Confidence: {row['confidence']}")
-                        st.code(row["raw_reply"], language=None)
-                        if row["matches"]:
-                            st.dataframe(row["matches"], use_container_width=True)
-                        else:
-                            st.write("No OpenFoodFacts match found.")
+                        for row in enrichment_rows:
+                            with st.expander(
+                                f"Det {row['index']} | {row['yolo_class']} | {row['product_name'] or 'no name'}",
+                                expanded=False):
+                                st.image(row["crop"], caption=f"Crop {row['index']}", width=220)
+                                st.caption(f"Confidence: {row['confidence']}")
+                                st.code(row["raw_reply"], language=None)
+                                if row["matches"]:
+                                    st.dataframe(row["matches"], use_container_width=True)
+                                else:
+                                    st.write("No OpenFoodFacts match found.")
 
     # ── Auto-save ──────────────────────────────────────────────────────────────
     if auto_save:

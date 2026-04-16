@@ -1,0 +1,35 @@
+{
+  "source": "singapore-kallang-road7-elevenconvenience-storesnackssnack-foodjunk-D913MT",
+  "timestamp": "20260414_195503_654306",
+  "successful": true,
+  "total_detections": 1,
+  "enrichments": [
+    {
+      "index": 1,
+      "yolo_class": "cup",
+      "confidence": 0.856,
+      "product_name": "Gulp",
+      "matches_found": 0,
+      "raw_reply": "product_name: Gulp",
+      "matches": []
+    },
+    {
+      "index": 2,
+      "yolo_class": "toothbrush",
+      "confidence": 0.418,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Error: 'list' object has no attribute 'lower'",
+      "matches": []
+    },
+    {
+      "index": 3,
+      "yolo_class": "toothbrush",
+      "confidence": 0.388,
+      "product_name": "",
+      "matches_found": 0,
+      "raw_reply": "Stopped: Model 'openrouter/free' not found on OpenRouter (404). Please select a different model in the sidebar.",
+      "matches": []
+    }
+  ]
+}
