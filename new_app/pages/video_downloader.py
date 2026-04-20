@@ -4,7 +4,7 @@ from pathlib import Path
 
 import streamlit as st
 
-from new_app.utils.downloader import download_video
+from utils.downloader import download_video
 
 
 DEFAULT_OUTPUT_DIR = "downloads"

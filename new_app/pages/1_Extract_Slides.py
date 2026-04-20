@@ -11,7 +11,7 @@ import numpy as np
 import streamlit as st
 
 # ── Constants ──────────────────────────────────────────────────────────────────
-PROJECT_ROOT  = Path(__file__).resolve().parents[2]
+PROJECT_ROOT  = Path(__file__).resolve().parents[1]
 DOWNLOADS_DIR = PROJECT_ROOT / "downloads"
 SLIDES_DIR    = PROJECT_ROOT / "extracted_slides"
 RESUME_DIR    = PROJECT_ROOT / ".resume_checkpoints"
