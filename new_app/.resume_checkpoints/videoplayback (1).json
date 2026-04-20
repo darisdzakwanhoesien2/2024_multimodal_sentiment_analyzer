@@ -1,0 +1,725 @@
+{
+  "last_timestamp": 910.33,
+  "slides": [
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_10.33s_score0.428.jpg",
+      "timestamp": 10.33,
+      "score": 0.4283,
+      "frame_index": 310,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_214.33s_score0.083.jpg",
+      "timestamp": 214.33,
+      "score": 0.0826,
+      "frame_index": 6430,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_313.00s_score0.125.jpg",
+      "timestamp": 313.0,
+      "score": 0.1246,
+      "frame_index": 9390,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_775.67s_score0.124.jpg",
+      "timestamp": 775.67,
+      "score": 0.1244,
+      "frame_index": 23270,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_777.33s_score0.147.jpg",
+      "timestamp": 777.33,
+      "score": 0.1467,
+      "frame_index": 23320,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_779.33s_score0.205.jpg",
+      "timestamp": 779.33,
+      "score": 0.2051,
+      "frame_index": 23380,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_782.33s_score0.131.jpg",
+      "timestamp": 782.33,
+      "score": 0.1314,
+      "frame_index": 23470,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_783.67s_score0.193.jpg",
+      "timestamp": 783.67,
+      "score": 0.1933,
+      "frame_index": 23510,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_784.67s_score0.095.jpg",
+      "timestamp": 784.67,
+      "score": 0.0949,
+      "frame_index": 23540,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_785.67s_score0.120.jpg",
+      "timestamp": 785.67,
+      "score": 0.12,
+      "frame_index": 23570,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_787.00s_score0.102.jpg",
+      "timestamp": 787.0,
+      "score": 0.1021,
+      "frame_index": 23610,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_788.67s_score0.258.jpg",
+      "timestamp": 788.67,
+      "score": 0.2584,
+      "frame_index": 23660,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_790.00s_score0.260.jpg",
+      "timestamp": 790.0,
+      "score": 0.2598,
+      "frame_index": 23700,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_791.33s_score0.257.jpg",
+      "timestamp": 791.33,
+      "score": 0.2566,
+      "frame_index": 23740,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_793.00s_score0.247.jpg",
+      "timestamp": 793.0,
+      "score": 0.2466,
+      "frame_index": 23790,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_794.33s_score0.262.jpg",
+      "timestamp": 794.33,
+      "score": 0.2622,
+      "frame_index": 23830,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_795.33s_score0.187.jpg",
+      "timestamp": 795.33,
+      "score": 0.1869,
+      "frame_index": 23860,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_796.33s_score0.279.jpg",
+      "timestamp": 796.33,
+      "score": 0.2792,
+      "frame_index": 23890,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_797.33s_score0.267.jpg",
+      "timestamp": 797.33,
+      "score": 0.2667,
+      "frame_index": 23920,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_798.33s_score0.081.jpg",
+      "timestamp": 798.33,
+      "score": 0.081,
+      "frame_index": 23950,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_799.33s_score0.111.jpg",
+      "timestamp": 799.33,
+      "score": 0.1105,
+      "frame_index": 23980,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_800.33s_score0.106.jpg",
+      "timestamp": 800.33,
+      "score": 0.1063,
+      "frame_index": 24010,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_801.67s_score0.258.jpg",
+      "timestamp": 801.67,
+      "score": 0.2577,
+      "frame_index": 24050,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_803.33s_score0.166.jpg",
+      "timestamp": 803.33,
+      "score": 0.1656,
+      "frame_index": 24100,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_807.00s_score0.164.jpg",
+      "timestamp": 807.0,
+      "score": 0.1637,
+      "frame_index": 24210,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_808.33s_score0.187.jpg",
+      "timestamp": 808.33,
+      "score": 0.1871,
+      "frame_index": 24250,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_812.00s_score0.184.jpg",
+      "timestamp": 812.0,
+      "score": 0.1838,
+      "frame_index": 24360,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_814.33s_score0.180.jpg",
+      "timestamp": 814.33,
+      "score": 0.1796,
+      "frame_index": 24430,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_815.33s_score0.096.jpg",
+      "timestamp": 815.33,
+      "score": 0.0957,
+      "frame_index": 24460,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_816.33s_score0.096.jpg",
+      "timestamp": 816.33,
+      "score": 0.0964,
+      "frame_index": 24490,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_817.33s_score0.096.jpg",
+      "timestamp": 817.33,
+      "score": 0.0959,
+      "frame_index": 24520,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_818.33s_score0.260.jpg",
+      "timestamp": 818.33,
+      "score": 0.2596,
+      "frame_index": 24550,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_819.33s_score0.141.jpg",
+      "timestamp": 819.33,
+      "score": 0.1411,
+      "frame_index": 24580,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_820.33s_score0.138.jpg",
+      "timestamp": 820.33,
+      "score": 0.1376,
+      "frame_index": 24610,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_825.33s_score0.241.jpg",
+      "timestamp": 825.33,
+      "score": 0.2414,
+      "frame_index": 24760,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_826.33s_score0.167.jpg",
+      "timestamp": 826.33,
+      "score": 0.1669,
+      "frame_index": 24790,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_827.33s_score0.197.jpg",
+      "timestamp": 827.33,
+      "score": 0.1972,
+      "frame_index": 24820,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_828.33s_score0.124.jpg",
+      "timestamp": 828.33,
+      "score": 0.1238,
+      "frame_index": 24850,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_829.33s_score0.126.jpg",
+      "timestamp": 829.33,
+      "score": 0.1262,
+      "frame_index": 24880,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_830.33s_score0.149.jpg",
+      "timestamp": 830.33,
+      "score": 0.1486,
+      "frame_index": 24910,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_836.00s_score0.209.jpg",
+      "timestamp": 836.0,
+      "score": 0.2088,
+      "frame_index": 25080,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_837.67s_score0.212.jpg",
+      "timestamp": 837.67,
+      "score": 0.2123,
+      "frame_index": 25130,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_840.00s_score0.208.jpg",
+      "timestamp": 840.0,
+      "score": 0.2077,
+      "frame_index": 25200,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_841.33s_score0.094.jpg",
+      "timestamp": 841.33,
+      "score": 0.0936,
+      "frame_index": 25240,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_842.33s_score0.100.jpg",
+      "timestamp": 842.33,
+      "score": 0.0998,
+      "frame_index": 25270,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_844.33s_score0.084.jpg",
+      "timestamp": 844.33,
+      "score": 0.0839,
+      "frame_index": 25330,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_846.67s_score0.175.jpg",
+      "timestamp": 846.67,
+      "score": 0.1746,
+      "frame_index": 25400,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_848.00s_score0.153.jpg",
+      "timestamp": 848.0,
+      "score": 0.1529,
+      "frame_index": 25440,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_849.33s_score0.190.jpg",
+      "timestamp": 849.33,
+      "score": 0.1896,
+      "frame_index": 25480,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_851.00s_score0.089.jpg",
+      "timestamp": 851.0,
+      "score": 0.0895,
+      "frame_index": 25530,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_853.33s_score0.144.jpg",
+      "timestamp": 853.33,
+      "score": 0.1438,
+      "frame_index": 25600,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_855.67s_score0.240.jpg",
+      "timestamp": 855.67,
+      "score": 0.2404,
+      "frame_index": 25670,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_857.33s_score0.113.jpg",
+      "timestamp": 857.33,
+      "score": 0.1128,
+      "frame_index": 25720,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_858.33s_score0.139.jpg",
+      "timestamp": 858.33,
+      "score": 0.1386,
+      "frame_index": 25750,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_860.00s_score0.165.jpg",
+      "timestamp": 860.0,
+      "score": 0.1649,
+      "frame_index": 25800,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_862.00s_score0.160.jpg",
+      "timestamp": 862.0,
+      "score": 0.1596,
+      "frame_index": 25860,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_863.67s_score0.197.jpg",
+      "timestamp": 863.67,
+      "score": 0.1968,
+      "frame_index": 25910,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_865.00s_score0.190.jpg",
+      "timestamp": 865.0,
+      "score": 0.19,
+      "frame_index": 25950,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_866.00s_score0.094.jpg",
+      "timestamp": 866.0,
+      "score": 0.0941,
+      "frame_index": 25980,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_867.00s_score0.257.jpg",
+      "timestamp": 867.0,
+      "score": 0.2567,
+      "frame_index": 26010,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_868.33s_score0.179.jpg",
+      "timestamp": 868.33,
+      "score": 0.1789,
+      "frame_index": 26050,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_869.33s_score0.083.jpg",
+      "timestamp": 869.33,
+      "score": 0.0829,
+      "frame_index": 26080,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_871.00s_score0.086.jpg",
+      "timestamp": 871.0,
+      "score": 0.0861,
+      "frame_index": 26130,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_872.67s_score0.306.jpg",
+      "timestamp": 872.67,
+      "score": 0.3055,
+      "frame_index": 26180,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_874.00s_score0.103.jpg",
+      "timestamp": 874.0,
+      "score": 0.1029,
+      "frame_index": 26220,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_875.67s_score0.192.jpg",
+      "timestamp": 875.67,
+      "score": 0.1921,
+      "frame_index": 26270,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_877.33s_score0.252.jpg",
+      "timestamp": 877.33,
+      "score": 0.2525,
+      "frame_index": 26320,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_878.33s_score0.088.jpg",
+      "timestamp": 878.33,
+      "score": 0.0881,
+      "frame_index": 26350,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_881.00s_score0.241.jpg",
+      "timestamp": 881.0,
+      "score": 0.2411,
+      "frame_index": 26430,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_882.33s_score0.080.jpg",
+      "timestamp": 882.33,
+      "score": 0.0802,
+      "frame_index": 26470,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_883.33s_score0.102.jpg",
+      "timestamp": 883.33,
+      "score": 0.1015,
+      "frame_index": 26500,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_884.33s_score0.085.jpg",
+      "timestamp": 884.33,
+      "score": 0.085,
+      "frame_index": 26530,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_885.67s_score0.182.jpg",
+      "timestamp": 885.67,
+      "score": 0.1818,
+      "frame_index": 26570,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_887.33s_score0.200.jpg",
+      "timestamp": 887.33,
+      "score": 0.2001,
+      "frame_index": 26620,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_888.67s_score0.106.jpg",
+      "timestamp": 888.67,
+      "score": 0.1061,
+      "frame_index": 26660,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_890.67s_score0.240.jpg",
+      "timestamp": 890.67,
+      "score": 0.2404,
+      "frame_index": 26720,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_893.67s_score0.083.jpg",
+      "timestamp": 893.67,
+      "score": 0.0832,
+      "frame_index": 26810,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_895.67s_score0.155.jpg",
+      "timestamp": 895.67,
+      "score": 0.1553,
+      "frame_index": 26870,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_903.67s_score0.271.jpg",
+      "timestamp": 903.67,
+      "score": 0.2711,
+      "frame_index": 27110,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    },
+    {
+      "frame": "/home/ubuntu/apps/2024_multimodal_sentiment_analyzer/new_app/extracted_slides/videoplayback (1)/slide_910.33s_score0.370.jpg",
+      "timestamp": 910.33,
+      "score": 0.3698,
+      "frame_index": 27310,
+      "total_frames": 27730,
+      "duration_s": 924.3,
+      "fps": 30.0
+    }
+  ]
+}
