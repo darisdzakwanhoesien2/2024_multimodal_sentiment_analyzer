@@ -1,0 +1,11 @@
+streamlit
+numpy
+pandas
+matplotlib
+opencv-python-headless
+yt-dlp
+huggingface_hub
+pyannote.audio
+faster-whisper
+torch
+torchaudio
