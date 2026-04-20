@@ -18,3 +18,7 @@ pillow
 numpy
 
 pip install ultralytics opencv-python-headless pillow numpy
+
+
+git checkout main_new
+nohup streamlit run halal_product/app.py --server.address 0.0.0.0 --server.port 8502 > streamlit.log 2>&1 &

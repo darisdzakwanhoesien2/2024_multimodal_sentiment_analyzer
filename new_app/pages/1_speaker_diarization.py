@@ -32,7 +32,7 @@ if Pipeline is None:
     st.stop()
 
 # --- Added: allow selecting existing files from project downloads ---
-PROJECT_ROOT = Path(__file__).resolve().parents[2]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DOWNLOADS_DIR = PROJECT_ROOT / "downloads"
 DOWNLOADS_DIR.mkdir(parents=True, exist_ok=True)
 
