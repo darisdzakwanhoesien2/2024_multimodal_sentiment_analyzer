@@ -79,6 +79,16 @@ def download_video(
     cookies_file: Path | None = None,
 ) -> Path:
     import yt_dlp
+    import subprocess
+
+    # Check for ffmpeg
+    try:
+        subprocess.run(["ffmpeg", "-version"], capture_output=True, check=True)
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        raise RuntimeError(
+            "ffmpeg is not installed. It is required to merge high-quality video and audio. "
+            "Please install it (e.g., `sudo apt install ffmpeg`)."
+        )
 
     output_dir.mkdir(parents=True, exist_ok=True)
     ydl_opts = build_ydl_options(
@@ -92,10 +102,15 @@ def download_video(
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(url, download=True)
             final_path = Path(ydl.prepare_filename(info))
-            if final_path.suffix.lower() != ".mp4":
-                candidate = final_path.with_suffix(".mp4")
-                if candidate.exists():
-                    final_path = candidate
+            # yt-dlp might have merged into an mp4 even if requested otherwise, 
+            # or preparing the filename might not reflect the actual final extension.
+            if not final_path.exists():
+                # Try to find the file with common extensions if the exact match fails
+                for ext in [".mp4", ".mkv", ".webm"]:
+                    candidate = final_path.with_suffix(ext)
+                    if candidate.exists():
+                        final_path = candidate
+                        break
             return final_path
     except Exception as exc:
         _raise_friendly_error(exc)
