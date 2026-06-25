@@ -1,3 +1,4 @@
+test
 Got it — before fixing your code, the **correct first step** is exactly what you said:
 
 ### ✅ **Rebuild the project directory structure**
