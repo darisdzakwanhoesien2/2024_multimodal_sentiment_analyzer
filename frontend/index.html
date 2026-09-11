@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Speaker Diarization &amp; Transcription</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="wrap">
+    <h1>🎙️ Speaker Diarization &amp; Transcription</h1>
+    <p class="subtitle">pyannote.audio diarization + faster-whisper transcription. API docs at <a href="/docs">/docs</a>.</p>
+
+    <div class="panel">
+      <label for="hfToken">Hugging Face Token</label>
+      <input type="password" id="hfToken" placeholder="hf_...">
+      <button type="button" class="secondary" id="verifyBtn">Verify token</button>
+      <div id="verifyResult" class="status-line"></div>
+    </div>
+
+    <div class="panel">
+      <label for="fileInput">Audio / video file</label>
+      <input type="file" id="fileInput" accept=".wav,.mp3,.m4a,.flac,.ogg,.mp4,.mkv,.mov,.avi">
+
+      <div class="row">
+        <div>
+          <label for="modelChoice">Diarization model</label>
+          <select id="modelChoice">
+            <option value="pyannote/speaker-diarization-3.1">pyannote/speaker-diarization-3.1</option>
+            <option value="pyannote/speaker-diarization-3.0">pyannote/speaker-diarization-3.0</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="numSpeakers">Num speakers (0 = auto)</label>
+          <input type="number" id="numSpeakers" value="0" min="0">
+        </div>
+        <div>
+          <label for="minSpeakers">Min speakers</label>
+          <input type="number" id="minSpeakers" value="0" min="0">
+        </div>
+        <div>
+          <label for="maxSpeakers">Max speakers</label>
+          <input type="number" id="maxSpeakers" value="0" min="0">
+        </div>
+      </div>
+
+      <div class="checkbox-row">
+        <input type="checkbox" id="doTranscribe">
+        <label for="doTranscribe" style="margin:0;">Transcribe audio (faster-whisper)</label>
+      </div>
+
+      <div id="whisperOptions" class="hidden">
+        <div class="row">
+          <div>
+            <label for="whisperModel">Whisper model size</label>
+            <select id="whisperModel">
+              <option value="tiny">tiny</option>
+              <option value="base">base</option>
+              <option value="small" selected>small</option>
+              <option value="medium">medium</option>
+              <option value="large-v2">large-v2</option>
+              <option value="large-v3">large-v3</option>
+            </select>
+          </div>
+          <div>
+            <label for="whisperLanguage">Language code (optional)</label>
+            <input type="text" id="whisperLanguage" placeholder="e.g. en, ms, zh">
+          </div>
+        </div>
+        <p class="small">CPU-only server: larger models are much slower and use more disk. "small" is the default for a reason.</p>
+      </div>
+
+      <button type="button" id="runBtn">▶ Run diarization</button>
+      <div id="runStatus" class="status-line"></div>
+    </div>
+
+    <div id="resultsPanel" class="panel hidden">
+      <h3>Results</h3>
+      <div id="summaryLine" class="small"></div>
+
+      <h4>Timeline</h4>
+      <div id="timeline" class="timeline"></div>
+
+      <h4>Segments</h4>
+      <table id="segmentsTable"><thead><tr><th>Start</th><th>End</th><th>Duration</th><th>Speaker</th></tr></thead><tbody></tbody></table>
+
+      <h4>Speaker stats</h4>
+      <table id="statsTable"><thead><tr><th>Speaker</th><th>Segments</th><th>Total time (s)</th><th>Avg segment (s)</th><th>%</th></tr></thead><tbody></tbody></table>
+
+      <div id="transcriptSection" class="hidden">
+        <h4>Transcript</h4>
+        <div id="transcriptBox" class="transcript-box"></div>
+
+        <h4>Speaker-aligned transcript</h4>
+        <table id="alignedTable"><thead><tr><th>Start</th><th>End</th><th>Speaker</th><th>Text</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <div style="margin-top:16px;">
+        <a id="dlRttm" class="dl" href="#">⬇ RTTM</a>
+        <a id="dlTranscript" class="dl hidden" href="#">⬇ Transcript (.txt)</a>
+        <a id="dlCsv" class="dl" href="#">⬇ Segments (.csv)</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
