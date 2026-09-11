@@ -206,6 +206,17 @@ async function loadResult(jobId) {
     `${data.num_speakers} speaker(s), ${data.segments.length} segments` +
     (data.detected_language ? ` — language: ${data.detected_language} (${Math.round(data.language_probability * 100)}%)` : "");
 
+  if (data.has_video) {
+    $("videoSection").classList.remove("hidden");
+    $("resultVideoPlayer").src = `/api/jobs/${jobId}/video`;
+    $("dlResultVideo").href = `/api/jobs/${jobId}/video`;
+    $("dlResultVideo").classList.remove("hidden");
+  } else {
+    $("videoSection").classList.add("hidden");
+    $("resultVideoPlayer").removeAttribute("src");
+    $("dlResultVideo").classList.add("hidden");
+  }
+
   if (data.has_audio) {
     $("audioSection").classList.remove("hidden");
     $("audioPlayer").src = `/api/jobs/${jobId}/audio`;

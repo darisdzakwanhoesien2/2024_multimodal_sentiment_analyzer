@@ -9,6 +9,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 from .core.align import align_transcript_with_speakers
+from .core.audio import VIDEO_EXTS as _VIDEO_EXTS
 from .core.audio import extract_audio_if_video
 from .core.diarization import DiarizationError, load_pipeline, run_diarization, speaker_stats
 from .core.transcription import TranscriptionError, run_transcription
@@ -168,18 +169,32 @@ def _process_download_job(job_id: str, job_dir: Path, youtube_url: str):
 
 def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dict, youtube_url: str | None = None):
     audio_path = None
+    video_path = None
     succeeded = False
     try:
         if youtube_url:
-            _set(job_id, status="running", progress="downloading audio from YouTube")
-            audio_path, title = download_audio(youtube_url, job_dir)
+            # Download the full video (not audio-only) so it survives as the
+            # job's persisted media for in-page playback alongside the
+            # transcript, same as an uploaded video does. Audio for the
+            # pipeline is extracted from it via the same helper used for
+            # video uploads below.
+            _set(job_id, status="running", progress="downloading video from YouTube")
+            video_path, title = download_video(youtube_url, job_dir)
             if title:
                 _set(job_id, file_name=title)
                 _update_meta(job_dir, file_name=title)
-            audio_path = str(audio_path)
+            video_path = str(video_path)
+
+            _set(job_id, status="running", progress="extracting audio")
+            audio_path = extract_audio_if_video(video_path, str(job_dir / "audio.mp3"))
         else:
             _set(job_id, status="running", progress="extracting audio")
             audio_path = extract_audio_if_video(input_path, str(job_dir / "audio.mp3"))
+            if audio_path != input_path:
+                # input_path was a video and got extracted to audio_path above;
+                # keep the original video itself as the persisted media (it
+                # already contains that audio) rather than the extraction.
+                video_path = input_path
 
         _set(job_id, progress=f"loading diarization pipeline ({params['model_choice']})")
         pipeline = load_pipeline(params["hf_token"], params["model_choice"])
@@ -222,7 +237,8 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
             "speaker_aligned_transcript": aligned,
             "detected_language": detected_language,
             "language_probability": language_probability,
-            "has_audio": bool(audio_path and os.path.exists(audio_path)),
+            "has_video": bool(video_path and os.path.exists(video_path)),
+            "has_audio": bool(not video_path and audio_path and os.path.exists(audio_path)),
         }
         (job_dir / "result.json").write_text(json.dumps(result))
         succeeded = True
@@ -233,23 +249,18 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
     except Exception as e:
         _set(job_id, status="error", progress="failed", error=f"{type(e).__name__}: {e}")
     finally:
-        # On success, keep audio_path (the file the pipeline actually used —
-        # either the original upload, or an extracted/downloaded mp3 already
-        # written inside job_dir) so results survive a restart. input_path is
-        # only removed here when it's a separate raw file distinct from
-        # audio_path (e.g. an uploaded video that got extracted to mp3) — no
-        # reason to keep the raw video too. On failure, nothing is worth
-        # keeping, so both are dropped.
-        if input_path and input_path != audio_path and os.path.exists(input_path):
-            try:
-                os.remove(input_path)
-            except OSError:
-                pass
-        if not succeeded and audio_path and os.path.exists(audio_path):
-            try:
-                os.remove(audio_path)
-            except OSError:
-                pass
+        # On success: if a video exists (youtube_url, or an uploaded video),
+        # it's the one persisted artifact — it already contains the audio, so
+        # the extracted audio.mp3 intermediate is redundant and gets dropped.
+        # Otherwise (audio-only source), audio_path is what's kept. On
+        # failure, nothing is worth keeping — everything gets dropped.
+        keep_path = video_path if (succeeded and video_path) else (audio_path if succeeded else None)
+        for path in {input_path, audio_path, video_path}:
+            if path and path != keep_path and os.path.exists(path):
+                try:
+                    os.remove(path)
+                except OSError:
+                    pass
 
 
 def job_dir(job_id: str) -> Path:
@@ -324,6 +335,8 @@ def _rehydrate_job(dir_path: Path) -> dict | None:
         rows = _parse_rttm(rttm_path.read_text())
         transcript_path = dir_path / "transcript.txt"
         transcript_text = transcript_path.read_text() if transcript_path.exists() else None
+        media_path = find_media(job_id)
+        is_video = media_path is not None and media_path.suffix.lower() in _VIDEO_EXTS
         result = {
             "segments": rows,
             "speaker_stats": speaker_stats(rows) if rows else [],
@@ -333,7 +346,8 @@ def _rehydrate_job(dir_path: Path) -> dict | None:
             "speaker_aligned_transcript": None,
             "detected_language": None,
             "language_probability": None,
-            "has_audio": find_media(job_id) is not None,
+            "has_video": is_video,
+            "has_audio": media_path is not None and not is_video,
         }
         return {**base, "status": "done", "progress": "done", "error": None, "result": result}
 
