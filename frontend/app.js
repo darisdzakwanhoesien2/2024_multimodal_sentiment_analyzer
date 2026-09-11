@@ -148,9 +148,11 @@ async function loadResult(jobId) {
     renderTable("alignedTable", data.speaker_aligned_transcript || [], (r) => [r.start, r.end, r.speaker, r.text]);
     $("dlTranscript").href = `/api/jobs/${jobId}/transcript.txt`;
     $("dlTranscript").classList.remove("hidden");
+    $("noTranscriptNote").classList.add("hidden");
   } else {
     transcriptSection.classList.add("hidden");
     $("dlTranscript").classList.add("hidden");
+    $("noTranscriptNote").classList.remove("hidden");
   }
 
   $("dlRttm").href = `/api/jobs/${jobId}/rttm`;

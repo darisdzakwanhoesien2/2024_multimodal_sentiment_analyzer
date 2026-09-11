@@ -52,11 +52,11 @@
       </div>
 
       <div class="checkbox-row">
-        <input type="checkbox" id="doTranscribe">
+        <input type="checkbox" id="doTranscribe" checked>
         <label for="doTranscribe" style="margin:0;">Transcribe audio (faster-whisper)</label>
       </div>
 
-      <div id="whisperOptions" class="hidden">
+      <div id="whisperOptions">
         <div class="row">
           <div>
             <label for="whisperModel">Whisper model size</label>
@@ -101,6 +101,7 @@
         <h4>Speaker-aligned transcript</h4>
         <table id="alignedTable"><thead><tr><th>Start</th><th>End</th><th>Speaker</th><th>Text</th></tr></thead><tbody></tbody></table>
       </div>
+      <p id="noTranscriptNote" class="small hidden">No transcript for this job — "Transcribe audio" wasn't checked when it ran. Re-run with it checked to get one.</p>
 
       <div style="margin-top:16px;">
         <a id="dlRttm" class="dl" href="#">⬇ RTTM</a>
@@ -117,6 +118,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>
