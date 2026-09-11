@@ -12,7 +12,7 @@ from .core.align import align_transcript_with_speakers
 from .core.audio import extract_audio_if_video
 from .core.diarization import DiarizationError, load_pipeline, run_diarization, speaker_stats
 from .core.transcription import TranscriptionError, run_transcription
-from .core.youtube import YoutubeDownloadError, download_audio
+from .core.youtube import YoutubeDownloadError, download_audio, download_video
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +63,8 @@ def list_jobs() -> list[dict]:
         jobs = list(_jobs.values())
     jobs.sort(key=lambda j: j["created_at"], reverse=True)
     return [
-        {"job_id": j["job_id"], "status": j["status"], "file_name": j["file_name"], "created_at": j["created_at"]}
+        {"job_id": j["job_id"], "status": j["status"], "file_name": j["file_name"],
+         "created_at": j["created_at"], "kind": j.get("kind", "diarize")}
         for j in jobs
     ]
 
@@ -81,7 +82,8 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
     created_at = time.time()
     display_name = file_name or youtube_url
     (job_dir / "meta.json").write_text(json.dumps({
-        "job_id": job_id, "file_name": display_name, "source_url": youtube_url, "created_at": created_at,
+        "job_id": job_id, "file_name": display_name, "source_url": youtube_url,
+        "created_at": created_at, "kind": "diarize",
     }))
 
     input_path = None
@@ -100,10 +102,68 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
             "source_url": youtube_url,
             "created_at": created_at,
             "result": None,
+            "kind": "diarize",
         }
 
     _executor.submit(_process_job, job_id, str(input_path) if input_path else None, job_dir, params, youtube_url)
     return job_id
+
+
+def create_download_job(youtube_url: str) -> str:
+    check_disk_space()
+
+    job_id = uuid.uuid4().hex
+    job_dir = DATA_DIR / job_id
+    job_dir.mkdir(parents=True, exist_ok=True)
+
+    created_at = time.time()
+    (job_dir / "meta.json").write_text(json.dumps({
+        "job_id": job_id, "file_name": youtube_url, "source_url": youtube_url,
+        "created_at": created_at, "kind": "download",
+    }))
+
+    with _lock:
+        _jobs[job_id] = {
+            "job_id": job_id,
+            "status": "queued",
+            "progress": "queued",
+            "error": None,
+            "file_name": youtube_url,
+            "source_url": youtube_url,
+            "created_at": created_at,
+            "result": None,
+            "kind": "download",
+        }
+
+    _executor.submit(_process_download_job, job_id, job_dir, youtube_url)
+    return job_id
+
+
+def _process_download_job(job_id: str, job_dir: Path, youtube_url: str):
+    video_path = None
+    succeeded = False
+    try:
+        _set(job_id, status="running", progress="downloading video from YouTube")
+        video_path, title = download_video(youtube_url, job_dir)
+        if title:
+            _set(job_id, file_name=title)
+            _update_meta(job_dir, file_name=title)
+
+        result = {"video_filename": video_path.name, "title": title}
+        (job_dir / "result.json").write_text(json.dumps(result))
+        succeeded = True
+        _set(job_id, status="done", progress="done", result=result)
+
+    except YoutubeDownloadError as e:
+        _set(job_id, status="error", progress="failed", error=str(e))
+    except Exception as e:
+        _set(job_id, status="error", progress="failed", error=f"{type(e).__name__}: {e}")
+    finally:
+        if not succeeded and video_path and os.path.exists(video_path):
+            try:
+                os.remove(video_path)
+            except OSError:
+                pass
 
 
 def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dict, youtube_url: str | None = None):
@@ -196,15 +256,15 @@ def job_dir(job_id: str) -> Path:
     return DATA_DIR / job_id
 
 
-_NON_AUDIO_NAMES = {"result.rttm", "result.json", "transcript.txt", "meta.json"}
+_NON_MEDIA_NAMES = {"result.rttm", "result.json", "transcript.txt", "meta.json"}
 
 
-def find_audio(job_id: str) -> Path | None:
+def find_media(job_id: str) -> Path | None:
     d = job_dir(job_id)
     if not d.is_dir():
         return None
     for candidate in sorted(d.iterdir()):
-        if candidate.is_file() and candidate.name not in _NON_AUDIO_NAMES:
+        if candidate.is_file() and candidate.name not in _NON_MEDIA_NAMES:
             return candidate
     return None
 
@@ -242,7 +302,9 @@ def _rehydrate_job(dir_path: Path) -> dict | None:
     source_url = meta.get("source_url")
     created_at = meta.get("created_at") or dir_path.stat().st_mtime
 
-    base = {"job_id": job_id, "file_name": file_name, "source_url": source_url, "created_at": created_at}
+    kind = meta.get("kind", "diarize")
+    base = {"job_id": job_id, "file_name": file_name, "source_url": source_url,
+            "created_at": created_at, "kind": kind}
 
     result_json = dir_path / "result.json"
     if result_json.exists():
@@ -271,7 +333,7 @@ def _rehydrate_job(dir_path: Path) -> dict | None:
             "speaker_aligned_transcript": None,
             "detected_language": None,
             "language_probability": None,
-            "has_audio": find_audio(job_id) is not None,
+            "has_audio": find_media(job_id) is not None,
         }
         return {**base, "status": "done", "progress": "done", "error": None, "result": result}
 

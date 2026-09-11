@@ -12,6 +12,7 @@ class JobStatusResponse(BaseModel):
     progress: str
     error: str | None = None
     file_name: str
+    kind: str = "diarize"
 
 
 class JobSummary(BaseModel):
@@ -19,6 +20,7 @@ class JobSummary(BaseModel):
     status: str
     file_name: str
     created_at: float
+    kind: str = "diarize"
 
 
 class HFVerifyResult(BaseModel):

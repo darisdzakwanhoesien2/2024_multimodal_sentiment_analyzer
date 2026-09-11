@@ -24,7 +24,15 @@
 
       <label for="youtubeUrl">…or a YouTube URL</label>
       <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
-      <p class="small">Provide a file <em>or</em> a URL, not both. Only audio is downloaded and processed.</p>
+      <p class="small">
+        Provide a file <em>or</em> a URL, not both. Running diarization only downloads audio.
+        <button type="button" class="secondary" id="downloadVideoBtn" style="margin:8px 0 0;">⬇ Just download the video (no processing)</button>
+      </p>
+      <div id="downloadStatus" class="status-line"></div>
+      <div id="downloadResult" class="hidden">
+        <video id="downloadedVideoPlayer" controls style="width:100%; margin-top:8px;"></video>
+        <div style="margin-top:8px;"><a id="dlVideo" class="dl" href="#">⬇ Download video file</a></div>
+      </div>
 
       <div class="row">
         <div>
@@ -117,12 +125,12 @@
 
     <div class="panel">
       <h3>Previous attempts</h3>
-      <p class="small">Click "Open ↗" to view a past run in its own tab. History is kept in memory only — it's lost if the server restarts.</p>
+      <p class="small">Click "Open ↗" to view a past run in its own tab. Results and audio/video survive a server restart.</p>
       <button type="button" class="secondary" id="refreshHistoryBtn">↻ Refresh</button>
-      <table id="historyTable"><thead><tr><th>When</th><th>Source</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+      <table id="historyTable"><thead><tr><th>When</th><th>Type</th><th>Source</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
     </div>
   </div>
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>

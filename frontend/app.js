@@ -99,6 +99,75 @@ $("runBtn").addEventListener("click", async () => {
   }
 });
 
+let downloadPollTimer = null;
+
+$("downloadVideoBtn").addEventListener("click", async () => {
+  const youtubeUrl = $("youtubeUrl").value.trim();
+  const status = $("downloadStatus");
+
+  if (!youtubeUrl) {
+    status.textContent = "Paste a YouTube URL first.";
+    status.className = "status-line status-error";
+    return;
+  }
+
+  $("downloadResult").classList.add("hidden");
+  $("downloadVideoBtn").disabled = true;
+  if (downloadPollTimer) clearInterval(downloadPollTimer);
+
+  const form = new FormData();
+  form.append("youtube_url", youtubeUrl);
+
+  status.textContent = "Starting download…";
+  status.className = "status-line";
+
+  try {
+    const res = await fetch("/api/downloads", { method: "POST", body: form });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ detail: res.statusText }));
+      throw new Error(err.detail || res.statusText);
+    }
+    const { job_id } = await res.json();
+    pollDownload(job_id);
+    loadHistory();
+  } catch (e) {
+    status.textContent = `Failed to start download: ${e.message}`;
+    status.className = "status-line status-error";
+    $("downloadVideoBtn").disabled = false;
+  }
+});
+
+function pollDownload(jobId) {
+  const status = $("downloadStatus");
+  downloadPollTimer = setInterval(async () => {
+    const res = await fetch(`/api/jobs/${jobId}`);
+    if (!res.ok) return;
+    const job = await res.json();
+
+    if (job.status === "error") {
+      clearInterval(downloadPollTimer);
+      status.textContent = `❌ ${job.error}`;
+      status.className = "status-line status-error";
+      $("downloadVideoBtn").disabled = false;
+      loadHistory();
+      return;
+    }
+    if (job.status === "done") {
+      clearInterval(downloadPollTimer);
+      status.textContent = "✅ Done";
+      status.className = "status-line status-success";
+      $("downloadVideoBtn").disabled = false;
+      $("downloadResult").classList.remove("hidden");
+      $("downloadedVideoPlayer").src = `/api/jobs/${jobId}/video`;
+      $("dlVideo").href = `/api/jobs/${jobId}/video`;
+      loadHistory();
+      return;
+    }
+    status.textContent = `⏳ ${job.progress}`;
+    status.className = "status-line";
+  }, 2000);
+}
+
 function pollJob(jobId) {
   const status = $("runStatus");
   pollTimer = setInterval(async () => {
@@ -235,6 +304,7 @@ function downloadCsv(segments) {
 }
 
 const STATUS_ICON = { queued: "⏳", running: "⏳", done: "✅", error: "❌" };
+const KIND_LABEL = { diarize: "🎙️ Diarize", download: "🎬 Download" };
 
 async function loadHistory() {
   const tbody = document.querySelector("#historyTable tbody");
@@ -250,6 +320,10 @@ async function loadHistory() {
     whenTd.textContent = new Date(job.created_at * 1000).toLocaleString();
     tr.appendChild(whenTd);
 
+    const kindTd = document.createElement("td");
+    kindTd.textContent = KIND_LABEL[job.kind] || job.kind;
+    tr.appendChild(kindTd);
+
     const sourceTd = document.createElement("td");
     sourceTd.textContent = job.file_name;
     sourceTd.title = job.file_name;
@@ -261,7 +335,12 @@ async function loadHistory() {
 
     const linkTd = document.createElement("td");
     const link = document.createElement("a");
-    link.href = `?job=${job.job_id}`;
+    // A finished download job links straight to the file; everything else
+    // (including a still-running download, to show its progress) opens the
+    // SPA view via ?job=.
+    link.href = (job.kind === "download" && job.status === "done")
+      ? `/api/jobs/${job.job_id}/video`
+      : `?job=${job.job_id}`;
     link.target = "_blank";
     link.className = "dl";
     link.textContent = "Open ↗";
@@ -285,6 +364,23 @@ async function loadJobFromQueryParam() {
     return;
   }
   const job = await res.json();
+
+  if (job.kind === "download") {
+    if (job.status === "done") {
+      $("downloadResult").classList.remove("hidden");
+      $("downloadedVideoPlayer").src = `/api/jobs/${jobId}/video`;
+      $("dlVideo").href = `/api/jobs/${jobId}/video`;
+      $("downloadStatus").textContent = "✅ Done";
+      $("downloadStatus").className = "status-line status-success";
+    } else if (job.status === "error") {
+      $("downloadStatus").textContent = `❌ ${job.error}`;
+      $("downloadStatus").className = "status-line status-error";
+    } else {
+      pollDownload(jobId);
+    }
+    return;
+  }
+
   if (job.status === "done") {
     loadResult(jobId);
   } else if (job.status === "error") {
