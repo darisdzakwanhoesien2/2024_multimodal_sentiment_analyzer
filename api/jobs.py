@@ -1,3 +1,5 @@
+import json
+import logging
 import os
 import shutil
 import threading
@@ -11,6 +13,8 @@ from .core.audio import extract_audio_if_video
 from .core.diarization import DiarizationError, load_pipeline, run_diarization, speaker_stats
 from .core.transcription import TranscriptionError, run_transcription
 from .core.youtube import YoutubeDownloadError, download_audio
+
+logger = logging.getLogger(__name__)
 
 DATA_DIR = Path(__file__).resolve().parent / "data" / "jobs"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
@@ -74,6 +78,12 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
     job_dir = DATA_DIR / job_id
     job_dir.mkdir(parents=True, exist_ok=True)
 
+    created_at = time.time()
+    display_name = file_name or youtube_url
+    (job_dir / "meta.json").write_text(json.dumps({
+        "job_id": job_id, "file_name": display_name, "source_url": youtube_url, "created_at": created_at,
+    }))
+
     input_path = None
     if file_bytes is not None:
         ext = os.path.splitext(file_name or "")[1].lower() or ".wav"
@@ -86,9 +96,9 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
             "status": "queued",
             "progress": "queued",
             "error": None,
-            "file_name": file_name or youtube_url,
+            "file_name": display_name,
             "source_url": youtube_url,
-            "created_at": time.time(),
+            "created_at": created_at,
             "result": None,
         }
 
@@ -105,6 +115,7 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
             audio_path, title = download_audio(youtube_url, job_dir)
             if title:
                 _set(job_id, file_name=title)
+                _update_meta(job_dir, file_name=title)
             audio_path = str(audio_path)
         else:
             _set(job_id, status="running", progress="extracting audio")
@@ -153,6 +164,7 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
             "language_probability": language_probability,
             "has_audio": bool(audio_path and os.path.exists(audio_path)),
         }
+        (job_dir / "result.json").write_text(json.dumps(result))
         succeeded = True
         _set(job_id, status="done", progress="done", result=result)
 
@@ -184,7 +196,7 @@ def job_dir(job_id: str) -> Path:
     return DATA_DIR / job_id
 
 
-_NON_AUDIO_NAMES = {"result.rttm", "transcript.txt"}
+_NON_AUDIO_NAMES = {"result.rttm", "result.json", "transcript.txt", "meta.json"}
 
 
 def find_audio(job_id: str) -> Path | None:
@@ -195,3 +207,104 @@ def find_audio(job_id: str) -> Path | None:
         if candidate.is_file() and candidate.name not in _NON_AUDIO_NAMES:
             return candidate
     return None
+
+
+def _update_meta(dir_path: Path, **fields):
+    meta_path = dir_path / "meta.json"
+    try:
+        meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+        meta.update(fields)
+        meta_path.write_text(json.dumps(meta))
+    except (OSError, json.JSONDecodeError):
+        pass
+
+
+def _parse_rttm(text: str) -> list[dict]:
+    rows = []
+    for line in text.splitlines():
+        parts = line.split()
+        if len(parts) < 8 or parts[0] != "SPEAKER":
+            continue
+        start = round(float(parts[3]), 3)
+        dur = round(float(parts[4]), 3)
+        rows.append({"start": start, "end": round(start + dur, 3), "duration": dur, "speaker": parts[7]})
+    return rows
+
+
+def _rehydrate_job(dir_path: Path) -> dict | None:
+    job_id = dir_path.name
+    meta_path = dir_path / "meta.json"
+    try:
+        meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+    except (OSError, json.JSONDecodeError):
+        meta = {}
+    file_name = meta.get("file_name") or job_id
+    source_url = meta.get("source_url")
+    created_at = meta.get("created_at") or dir_path.stat().st_mtime
+
+    base = {"job_id": job_id, "file_name": file_name, "source_url": source_url, "created_at": created_at}
+
+    result_json = dir_path / "result.json"
+    if result_json.exists():
+        try:
+            result = json.loads(result_json.read_text())
+        except (OSError, json.JSONDecodeError):
+            result = None
+        if result is not None:
+            return {**base, "status": "done", "progress": "done", "error": None, "result": result}
+
+    rttm_path = dir_path / "result.rttm"
+    if rttm_path.exists():
+        # Legacy job from before result.json existed: reconstruct what's
+        # recoverable from rttm + transcript.txt. Word-level timing wasn't
+        # persisted separately back then, so transcript_segments and
+        # speaker_aligned_transcript can't be rebuilt and come back empty.
+        rows = _parse_rttm(rttm_path.read_text())
+        transcript_path = dir_path / "transcript.txt"
+        transcript_text = transcript_path.read_text() if transcript_path.exists() else None
+        result = {
+            "segments": rows,
+            "speaker_stats": speaker_stats(rows) if rows else [],
+            "num_speakers": len({r["speaker"] for r in rows}),
+            "transcript_text": transcript_text,
+            "transcript_segments": None,
+            "speaker_aligned_transcript": None,
+            "detected_language": None,
+            "language_probability": None,
+            "has_audio": find_audio(job_id) is not None,
+        }
+        return {**base, "status": "done", "progress": "done", "error": None, "result": result}
+
+    # No output artifacts: this job was still queued/running when the server
+    # stopped. Nothing safe to resume from — drop any orphaned raw audio it
+    # left behind and record the interruption instead of silently vanishing.
+    for f in dir_path.iterdir():
+        if f.is_file() and f.name != "meta.json":
+            try:
+                f.unlink()
+            except OSError:
+                pass
+    return {**base, "status": "error", "progress": "failed",
+            "error": "Job was interrupted by a server restart.", "result": None}
+
+
+def _rehydrate_from_disk():
+    if not DATA_DIR.is_dir():
+        return
+    count = 0
+    for entry in DATA_DIR.iterdir():
+        if not entry.is_dir():
+            continue
+        try:
+            job = _rehydrate_job(entry)
+        except Exception as e:
+            logger.warning("Failed to rehydrate job %s: %s", entry.name, e)
+            continue
+        if job:
+            _jobs[job["job_id"]] = job
+            count += 1
+    if count:
+        logger.info("Rehydrated %d job(s) from disk.", count)
+
+
+_rehydrate_from_disk()
