@@ -15,6 +15,18 @@ YOUTUBE_URL_RE = re.compile(
 )
 
 
+@router.get("/youtube/channel")
+def list_channel(url: str, limit: int = 50):
+    from ..core.youtube import YoutubeDownloadError, is_channel_url, list_channel_videos
+
+    if not is_channel_url(url):
+        raise HTTPException(400, "That doesn't look like a youtube.com channel URL (e.g. youtube.com/@handle).")
+    try:
+        return list_channel_videos(url, limit=min(limit, 100))
+    except YoutubeDownloadError as e:
+        raise HTTPException(502, str(e)) from e
+
+
 @router.post("/jobs", response_model=JobCreatedResponse, status_code=202)
 async def create_job(
     file: UploadFile | None = None,

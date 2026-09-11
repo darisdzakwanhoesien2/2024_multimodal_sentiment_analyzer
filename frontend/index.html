@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Speaker Diarization &amp; Transcription</title>
-  <link rel="stylesheet" href="style.css?v=4">
+  <link rel="stylesheet" href="style.css?v=5">
 </head>
 <body>
   <div class="wrap">
@@ -16,6 +16,17 @@
       <input type="password" id="hfToken" placeholder="hf_...">
       <button type="button" class="secondary" id="verifyBtn">Verify token</button>
       <div id="verifyResult" class="status-line"></div>
+    </div>
+
+    <div class="panel">
+      <label for="channelUrl">Browse a YouTube channel</label>
+      <input type="text" id="channelUrl" placeholder="https://www.youtube.com/@handle">
+      <button type="button" class="secondary" id="fetchChannelBtn">Fetch videos</button>
+      <div id="channelStatus" class="status-line"></div>
+      <div id="channelResults" class="hidden">
+        <h4 id="channelTitle"></h4>
+        <div id="channelVideoList" class="channel-video-list"></div>
+      </div>
     </div>
 
     <div class="panel">
@@ -136,6 +147,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=9"></script>
+  <script src="app.js?v=10"></script>
 </body>
 </html>

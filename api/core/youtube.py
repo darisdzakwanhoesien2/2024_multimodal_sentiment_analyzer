@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 # Server-side cookies.txt (Netscape format, exported from a logged-in browser
@@ -76,6 +77,65 @@ def check_cookies_health() -> dict:
                           f"and replace it at {COOKIES_FILE} on the server.",
             }
         return {"ok": False, "cookies_present": True, "detail": f"Unexpected error while checking: {msg[:200]}"}
+
+
+_CHANNEL_URL_RE = re.compile(
+    r"^https?://(www\.)?youtube\.com/(@[\w.-]+|channel/[\w-]+|c/[\w.-]+|user/[\w.-]+)"
+)
+_CHANNEL_TAB_RE = re.compile(r"/(videos|shorts|streams|playlists)(/|$|\?)")
+
+
+def normalize_channel_url(url: str) -> str:
+    """Channels default to their Home tab, which yt-dlp can't flat-list the
+    same way; append /videos when the URL doesn't already name a tab."""
+    url = url.strip().rstrip("/")
+    if not _CHANNEL_TAB_RE.search(url):
+        url += "/videos"
+    return url
+
+
+def is_channel_url(url: str) -> bool:
+    return bool(_CHANNEL_URL_RE.match(url.strip()))
+
+
+def list_channel_videos(url: str, limit: int = 50) -> dict:
+    """Flat-list a channel's videos (metadata only, nothing downloaded).
+    Returns {channel_title, channel_url, videos: [{id, title, url, duration,
+    thumbnail, view_count}, ...]}."""
+    import yt_dlp
+
+    opts = {**_base_ydl_opts(), "extract_flat": "in_playlist", "playlistend": limit}
+    normalized = normalize_channel_url(url)
+
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            info = ydl.extract_info(normalized, download=False)
+    except Exception as e:
+        msg = str(e).lower()
+        if "sign in to confirm" in msg or "cookies" in msg:
+            raise YoutubeDownloadError(
+                "YouTube is asking for an authenticated session (bot check) for this channel, and "
+                f"this server has no cookies configured to pass it. Export a cookies.txt from a "
+                f"logged-in browser session and place it at {COOKIES_FILE} on the server, then retry."
+            ) from e
+        raise YoutubeDownloadError(f"Failed to list channel videos: {e}") from e
+
+    videos = []
+    for entry in (info or {}).get("entries") or []:
+        if not entry or not entry.get("id"):
+            continue
+        thumbs = entry.get("thumbnails") or []
+        videos.append({
+            "id": entry["id"],
+            "title": entry.get("title") or entry["id"],
+            "url": entry.get("url") or f"https://www.youtube.com/watch?v={entry['id']}",
+            "duration": entry.get("duration"),
+            "thumbnail": thumbs[-1]["url"] if thumbs else None,
+            "view_count": entry.get("view_count"),
+        })
+
+    channel_title = (info or {}).get("channel") or (info or {}).get("title") or normalized
+    return {"channel_title": channel_title, "channel_url": normalized, "videos": videos}
 
 
 def download_audio(url: str, out_dir: Path) -> tuple[Path, str | None]:

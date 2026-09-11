@@ -1,5 +1,92 @@
 const $ = (id) => document.getElementById(id);
 
+function formatDuration(seconds) {
+  if (seconds == null) return "";
+  seconds = Math.round(seconds);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = seconds % 60;
+  const pad = (n) => String(n).padStart(2, "0");
+  return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
+}
+
+$("fetchChannelBtn").addEventListener("click", async () => {
+  const url = $("channelUrl").value.trim();
+  const status = $("channelStatus");
+  const results = $("channelResults");
+
+  if (!url) {
+    status.textContent = "Paste a channel URL first.";
+    status.className = "status-line status-error";
+    return;
+  }
+
+  results.classList.add("hidden");
+  status.textContent = "Fetching video list…";
+  status.className = "status-line";
+  $("fetchChannelBtn").disabled = true;
+
+  try {
+    const res = await fetch(`/api/youtube/channel?${new URLSearchParams({ url })}`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+
+    status.textContent = `✅ Found ${data.videos.length} video(s)`;
+    status.className = "status-line status-success";
+    $("channelTitle").textContent = data.channel_title;
+
+    const list = $("channelVideoList");
+    list.textContent = "";
+    for (const video of data.videos) {
+      const item = document.createElement("div");
+      item.className = "channel-video-item";
+
+      if (video.thumbnail) {
+        const img = document.createElement("img");
+        img.src = video.thumbnail;
+        img.alt = "";
+        item.appendChild(img);
+      }
+
+      const info = document.createElement("div");
+      info.className = "cv-info";
+      const title = document.createElement("div");
+      title.className = "cv-title";
+      title.textContent = video.title;
+      title.title = video.title;
+      const meta = document.createElement("div");
+      meta.className = "cv-meta";
+      meta.textContent = [
+        formatDuration(video.duration),
+        video.view_count != null ? `${video.view_count.toLocaleString()} views` : null,
+      ].filter(Boolean).join(" · ");
+      info.appendChild(title);
+      info.appendChild(meta);
+      item.appendChild(info);
+
+      const selectBtn = document.createElement("button");
+      selectBtn.type = "button";
+      selectBtn.className = "secondary";
+      selectBtn.textContent = "Select";
+      selectBtn.onclick = () => {
+        $("youtubeUrl").value = video.url;
+        $("fileInput").value = "";
+        $("youtubeUrl").scrollIntoView({ behavior: "smooth", block: "center" });
+        $("youtubeUrl").focus();
+      };
+      item.appendChild(selectBtn);
+
+      list.appendChild(item);
+    }
+    results.classList.remove("hidden");
+  } catch (e) {
+    status.textContent = `Failed to fetch channel: ${e.message}`;
+    status.className = "status-line status-error";
+  } finally {
+    $("fetchChannelBtn").disabled = false;
+  }
+});
+
 $("doTranscribe").addEventListener("change", (e) => {
   $("whisperOptions").classList.toggle("hidden", !e.target.checked);
 });
