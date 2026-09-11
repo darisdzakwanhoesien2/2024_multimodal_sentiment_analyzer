@@ -33,6 +33,16 @@ def get_job(job_id: str) -> dict | None:
         return dict(job) if job else None
 
 
+def list_jobs() -> list[dict]:
+    with _lock:
+        jobs = list(_jobs.values())
+    jobs.sort(key=lambda j: j["created_at"], reverse=True)
+    return [
+        {"job_id": j["job_id"], "status": j["status"], "file_name": j["file_name"], "created_at": j["created_at"]}
+        for j in jobs
+    ]
+
+
 def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | None = None,
                youtube_url: str | None = None) -> str:
     if not file_bytes and not youtube_url:

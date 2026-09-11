@@ -5,7 +5,7 @@ from fastapi import APIRouter, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 
 from .. import jobs
-from ..schemas import JobCreatedResponse, JobStatusResponse
+from ..schemas import JobCreatedResponse, JobStatusResponse, JobSummary
 
 router = APIRouter(prefix="/api", tags=["diarization"])
 
@@ -65,6 +65,11 @@ async def create_job(
         youtube_url=youtube_url or None,
     )
     return JobCreatedResponse(job_id=job_id, status="queued")
+
+
+@router.get("/jobs", response_model=list[JobSummary])
+def list_jobs():
+    return jobs.list_jobs()
 
 
 @router.get("/jobs/{job_id}", response_model=JobStatusResponse)

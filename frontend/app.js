@@ -91,6 +91,7 @@ $("runBtn").addEventListener("click", async () => {
     }
     const { job_id } = await res.json();
     pollJob(job_id);
+    loadHistory();
   } catch (e) {
     status.textContent = `Failed to start job: ${e.message}`;
     status.className = "status-line status-error";
@@ -110,6 +111,7 @@ function pollJob(jobId) {
       status.textContent = `❌ ${job.error}`;
       status.className = "status-line status-error";
       $("runBtn").disabled = false;
+      loadHistory();
       return;
     }
     if (job.status === "done") {
@@ -118,6 +120,7 @@ function pollJob(jobId) {
       status.className = "status-line status-success";
       $("runBtn").disabled = false;
       loadResult(jobId);
+      loadHistory();
       return;
     }
     status.textContent = `⏳ ${job.progress}`;
@@ -217,3 +220,67 @@ function downloadCsv(segments) {
   a.click();
   URL.revokeObjectURL(url);
 }
+
+const STATUS_ICON = { queued: "⏳", running: "⏳", done: "✅", error: "❌" };
+
+async function loadHistory() {
+  const tbody = document.querySelector("#historyTable tbody");
+  const res = await fetch("/api/jobs");
+  if (!res.ok) return;
+  const jobs = await res.json();
+
+  tbody.textContent = "";
+  for (const job of jobs) {
+    const tr = document.createElement("tr");
+
+    const whenTd = document.createElement("td");
+    whenTd.textContent = new Date(job.created_at * 1000).toLocaleString();
+    tr.appendChild(whenTd);
+
+    const sourceTd = document.createElement("td");
+    sourceTd.textContent = job.file_name;
+    sourceTd.title = job.file_name;
+    tr.appendChild(sourceTd);
+
+    const statusTd = document.createElement("td");
+    statusTd.textContent = `${STATUS_ICON[job.status] || ""} ${job.status}`;
+    tr.appendChild(statusTd);
+
+    const linkTd = document.createElement("td");
+    const link = document.createElement("a");
+    link.href = `?job=${job.job_id}`;
+    link.target = "_blank";
+    link.className = "dl";
+    link.textContent = "Open ↗";
+    linkTd.appendChild(link);
+    tr.appendChild(linkTd);
+
+    tbody.appendChild(tr);
+  }
+}
+
+$("refreshHistoryBtn").addEventListener("click", loadHistory);
+
+async function loadJobFromQueryParam() {
+  const jobId = new URLSearchParams(location.search).get("job");
+  if (!jobId) return;
+
+  const res = await fetch(`/api/jobs/${jobId}`);
+  if (!res.ok) {
+    $("runStatus").textContent = "That job wasn't found (server may have restarted since).";
+    $("runStatus").className = "status-line status-error";
+    return;
+  }
+  const job = await res.json();
+  if (job.status === "done") {
+    loadResult(jobId);
+  } else if (job.status === "error") {
+    $("runStatus").textContent = `❌ ${job.error}`;
+    $("runStatus").className = "status-line status-error";
+  } else {
+    pollJob(jobId);
+  }
+}
+
+loadJobFromQueryParam();
+loadHistory();

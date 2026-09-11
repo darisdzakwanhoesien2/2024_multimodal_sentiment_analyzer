@@ -108,8 +108,15 @@
         <a id="dlCsv" class="dl" href="#">⬇ Segments (.csv)</a>
       </div>
     </div>
+
+    <div class="panel">
+      <h3>Previous attempts</h3>
+      <p class="small">Click "Open ↗" to view a past run in its own tab. History is kept in memory only — it's lost if the server restarts.</p>
+      <button type="button" class="secondary" id="refreshHistoryBtn">↻ Refresh</button>
+      <table id="historyTable"><thead><tr><th>When</th><th>Source</th><th>Status</th><th></th></tr></thead><tbody></tbody></table>
+    </div>
   </div>
 
-  <script src="app.js?v=2"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

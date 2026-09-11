@@ -14,6 +14,13 @@ class JobStatusResponse(BaseModel):
     file_name: str
 
 
+class JobSummary(BaseModel):
+    job_id: str
+    status: str
+    file_name: str
+    created_at: float
+
+
 class HFVerifyResult(BaseModel):
     model: str
     accessible: bool
