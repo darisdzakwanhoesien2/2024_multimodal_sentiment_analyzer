@@ -38,6 +38,12 @@ def health():
     return HealthResponse(status="ok", packages=packages)
 
 
+@router.get("/youtube/health")
+def youtube_health():
+    from ..core.youtube import check_cookies_health
+    return check_cookies_health()
+
+
 @router.post("/hf/verify")
 def verify_hf_token(hf_token: str = Form(...)):
     from huggingface_hub import login as hf_login

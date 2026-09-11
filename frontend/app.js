@@ -402,5 +402,24 @@ async function loadJobFromQueryParam() {
   }
 }
 
+async function checkCookiesHealth() {
+  const line = $("cookiesHealthLine");
+  try {
+    const res = await fetch("/api/youtube/health");
+    const data = await res.json();
+    line.classList.remove("hidden");
+    if (data.ok) {
+      line.textContent = "✅ YouTube cookies OK";
+      line.className = "status-line status-success";
+    } else {
+      line.textContent = `⚠️ ${data.detail}`;
+      line.className = "status-line status-error";
+    }
+  } catch (e) {
+    // Non-critical — just skip showing the banner if the check itself fails.
+  }
+}
+
 loadJobFromQueryParam();
 loadHistory();
+checkCookiesHealth();

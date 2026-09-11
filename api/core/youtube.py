@@ -46,6 +46,38 @@ def _run_download(ydl_opts: dict, url: str, what: str):
         raise YoutubeDownloadError(f"Failed to download {what}: {e}") from e
 
 
+# "Me at the zoo" — the first video ever uploaded to YouTube. Always public,
+# never taken down, and tiny — a stable, lightweight canary for checking
+# whether cookies.txt still clears the bot-check, without downloading anything.
+_CANARY_URL = "https://www.youtube.com/watch?v=jNQXAC9IVRw"
+
+
+def check_cookies_health() -> dict:
+    """Probe whether cookies.txt is present and still valid, without
+    downloading anything. Used by /api/youtube/health so staleness shows up
+    proactively in the UI instead of only surfacing via a failed job."""
+    import yt_dlp
+
+    if not COOKIES_FILE.exists():
+        return {"ok": False, "cookies_present": False, "detail": "No cookies.txt configured on the server."}
+
+    opts = {**_base_ydl_opts(), "skip_download": True}
+    try:
+        with yt_dlp.YoutubeDL(opts) as ydl:
+            ydl.extract_info(_CANARY_URL, download=False)
+        return {"ok": True, "cookies_present": True, "detail": "Cookies are valid."}
+    except Exception as e:
+        msg = str(e)
+        lower = msg.lower()
+        if "sign in to confirm" in lower or "no longer valid" in lower or "cookies" in lower:
+            return {
+                "ok": False, "cookies_present": True,
+                "detail": "Cookies are present but expired or rotated — export a fresh cookies.txt "
+                          f"and replace it at {COOKIES_FILE} on the server.",
+            }
+        return {"ok": False, "cookies_present": True, "detail": f"Unexpected error while checking: {msg[:200]}"}
+
+
 def download_audio(url: str, out_dir: Path) -> tuple[Path, str | None]:
     """Download audio-only from a YouTube URL as mp3 (kept as the job's persisted
     audio afterward, so mp3 rather than wav to stay compact). Returns (mp3_path, video_title)."""
