@@ -85,6 +85,10 @@
       <h3>Results</h3>
       <div id="summaryLine" class="small"></div>
 
+      <div id="audioSection" class="hidden" style="margin-top:8px;">
+        <audio id="audioPlayer" controls style="width:100%;"></audio>
+      </div>
+
       <h4>Timeline</h4>
       <div id="timeline" class="timeline"></div>
 
@@ -104,6 +108,7 @@
       <p id="noTranscriptNote" class="small hidden">No transcript for this job — "Transcribe audio" wasn't checked when it ran. Re-run with it checked to get one.</p>
 
       <div style="margin-top:16px;">
+        <a id="dlAudio" class="dl hidden" href="#">⬇ Audio</a>
         <a id="dlRttm" class="dl" href="#">⬇ RTTM</a>
         <a id="dlTranscript" class="dl hidden" href="#">⬇ Transcript (.txt)</a>
         <a id="dlCsv" class="dl" href="#">⬇ Segments (.csv)</a>
@@ -118,6 +123,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>

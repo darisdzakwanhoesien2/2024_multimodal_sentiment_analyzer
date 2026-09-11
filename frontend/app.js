@@ -137,6 +137,17 @@ async function loadResult(jobId) {
     `${data.num_speakers} speaker(s), ${data.segments.length} segments` +
     (data.detected_language ? ` — language: ${data.detected_language} (${Math.round(data.language_probability * 100)}%)` : "");
 
+  if (data.has_audio) {
+    $("audioSection").classList.remove("hidden");
+    $("audioPlayer").src = `/api/jobs/${jobId}/audio`;
+    $("dlAudio").href = `/api/jobs/${jobId}/audio`;
+    $("dlAudio").classList.remove("hidden");
+  } else {
+    $("audioSection").classList.add("hidden");
+    $("audioPlayer").removeAttribute("src");
+    $("dlAudio").classList.add("hidden");
+  }
+
   renderTimeline(data.segments);
   renderTable("segmentsTable", data.segments, (r) => [r.start, r.end, r.duration, r.speaker]);
   renderTable("statsTable", data.speaker_stats, (r) => [r.speaker, r.segments, r.total_time, r.avg_segment, r.percentage]);

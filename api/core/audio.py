@@ -1,25 +1,24 @@
 import logging
 import os
 import subprocess
-import tempfile
 
 logger = logging.getLogger(__name__)
 
 VIDEO_EXTS = {".mp4", ".mkv", ".mov", ".avi"}
 
 
-def extract_audio_if_video(input_path: str) -> str:
-    """If input_path is a video file, extract mono 16kHz audio to a new wav and return its path.
-    Otherwise return input_path unchanged."""
+def extract_audio_if_video(input_path: str, out_path: str) -> str:
+    """If input_path is a video file, extract mono 16kHz audio as a compact mp3 at
+    out_path (inside the job dir, so it survives as the persisted result) and
+    return out_path. Otherwise return input_path unchanged — an already-audio
+    upload is kept exactly as given, no re-encoding."""
     ext = os.path.splitext(input_path)[1].lower()
     if ext not in VIDEO_EXTS:
         return input_path
 
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
-        out_path = tmp.name
-
     subprocess.run(
-        ["ffmpeg", "-y", "-i", input_path, "-vn", "-ac", "1", "-ar", "16000", out_path],
+        ["ffmpeg", "-y", "-i", input_path, "-vn", "-ac", "1", "-ar", "16000",
+         "-codec:a", "libmp3lame", "-qscale:a", "4", out_path],
         check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
     )
     return out_path

@@ -60,10 +60,13 @@ async def create_job(
         whisper_compute_type=whisper_compute_type,
         whisper_language=whisper_language,
     )
-    job_id = jobs.create_job(
-        params, file_name=file_name, file_bytes=file_bytes,
-        youtube_url=youtube_url or None,
-    )
+    try:
+        job_id = jobs.create_job(
+            params, file_name=file_name, file_bytes=file_bytes,
+            youtube_url=youtube_url or None,
+        )
+    except jobs.DiskSpaceError as e:
+        raise HTTPException(507, str(e)) from e
     return JobCreatedResponse(job_id=job_id, status="queued")
 
 
@@ -104,6 +107,21 @@ def get_job_rttm(job_id: str):
     if not path.exists():
         raise HTTPException(404, "RTTM file not found")
     return FileResponse(path, media_type="text/plain", filename=f"{job['file_name']}.rttm")
+
+
+@router.get("/jobs/{job_id}/audio")
+def get_job_audio(job_id: str):
+    job = jobs.get_job(job_id)
+    if job is None:
+        raise HTTPException(404, "Job not found")
+    path = jobs.find_audio(job_id)
+    if path is None:
+        raise HTTPException(404, "No audio stored for this job.")
+    media_type = {
+        ".mp3": "audio/mpeg", ".wav": "audio/wav", ".m4a": "audio/mp4",
+        ".flac": "audio/flac", ".ogg": "audio/ogg",
+    }.get(path.suffix.lower(), "application/octet-stream")
+    return FileResponse(path, media_type=media_type, filename=f"{job['file_name']}{path.suffix}")
 
 
 @router.get("/jobs/{job_id}/transcript.txt")

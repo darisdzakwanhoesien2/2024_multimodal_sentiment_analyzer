@@ -1,4 +1,5 @@
 import os
+import shutil
 import threading
 import time
 import uuid
@@ -13,6 +14,26 @@ from .core.youtube import YoutubeDownloadError, download_audio
 
 DATA_DIR = Path(__file__).resolve().parent / "data" / "jobs"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# Successful jobs now keep their audio permanently (previously deleted after
+# processing) so results survive a restart. This VPS runs several other
+# production services off the same disk with very little headroom, so refuse
+# new jobs outright below this floor rather than risk filling it.
+MIN_FREE_BYTES = 750 * 1024 * 1024
+
+
+class DiskSpaceError(RuntimeError):
+    pass
+
+
+def check_disk_space():
+    free = shutil.disk_usage(DATA_DIR).free
+    if free < MIN_FREE_BYTES:
+        raise DiskSpaceError(
+            f"Only {free / 1e6:.0f}MB free on the server — refusing to start a new job "
+            f"to protect other services sharing this disk. Ask the operator to free up space."
+        )
+
 
 _lock = threading.Lock()
 _jobs: dict = {}
@@ -47,6 +68,7 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
                youtube_url: str | None = None) -> str:
     if not file_bytes and not youtube_url:
         raise ValueError("Either a file or a youtube_url must be provided.")
+    check_disk_space()
 
     job_id = uuid.uuid4().hex
     job_dir = DATA_DIR / job_id
@@ -76,6 +98,7 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
 
 def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dict, youtube_url: str | None = None):
     audio_path = None
+    succeeded = False
     try:
         if youtube_url:
             _set(job_id, status="running", progress="downloading audio from YouTube")
@@ -85,7 +108,7 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
             audio_path = str(audio_path)
         else:
             _set(job_id, status="running", progress="extracting audio")
-            audio_path = extract_audio_if_video(input_path)
+            audio_path = extract_audio_if_video(input_path, str(job_dir / "audio.mp3"))
 
         _set(job_id, progress=f"loading diarization pipeline ({params['model_choice']})")
         pipeline = load_pipeline(params["hf_token"], params["model_choice"])
@@ -128,7 +151,9 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
             "speaker_aligned_transcript": aligned,
             "detected_language": detected_language,
             "language_probability": language_probability,
+            "has_audio": bool(audio_path and os.path.exists(audio_path)),
         }
+        succeeded = True
         _set(job_id, status="done", progress="done", result=result)
 
     except (DiarizationError, TranscriptionError, YoutubeDownloadError) as e:
@@ -136,16 +161,37 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
     except Exception as e:
         _set(job_id, status="error", progress="failed", error=f"{type(e).__name__}: {e}")
     finally:
-        # Keep only the small result artifacts (result.rttm, transcript.txt) on disk;
-        # raw uploaded/downloaded audio is dropped once processed to respect this
-        # VPS's tight disk budget.
-        for path in {input_path, audio_path}:
-            if path and os.path.exists(path):
-                try:
-                    os.remove(path)
-                except OSError:
-                    pass
+        # On success, keep audio_path (the file the pipeline actually used —
+        # either the original upload, or an extracted/downloaded mp3 already
+        # written inside job_dir) so results survive a restart. input_path is
+        # only removed here when it's a separate raw file distinct from
+        # audio_path (e.g. an uploaded video that got extracted to mp3) — no
+        # reason to keep the raw video too. On failure, nothing is worth
+        # keeping, so both are dropped.
+        if input_path and input_path != audio_path and os.path.exists(input_path):
+            try:
+                os.remove(input_path)
+            except OSError:
+                pass
+        if not succeeded and audio_path and os.path.exists(audio_path):
+            try:
+                os.remove(audio_path)
+            except OSError:
+                pass
 
 
 def job_dir(job_id: str) -> Path:
     return DATA_DIR / job_id
+
+
+_NON_AUDIO_NAMES = {"result.rttm", "transcript.txt"}
+
+
+def find_audio(job_id: str) -> Path | None:
+    d = job_dir(job_id)
+    if not d.is_dir():
+        return None
+    for candidate in sorted(d.iterdir()):
+        if candidate.is_file() and candidate.name not in _NON_AUDIO_NAMES:
+            return candidate
+    return None

@@ -12,7 +12,8 @@ class YoutubeDownloadError(RuntimeError):
 
 
 def download_audio(url: str, out_dir: Path) -> tuple[Path, str | None]:
-    """Download audio-only from a YouTube URL as wav. Returns (wav_path, video_title)."""
+    """Download audio-only from a YouTube URL as mp3 (kept as the job's persisted
+    audio afterward, so mp3 rather than wav to stay compact). Returns (mp3_path, video_title)."""
     import yt_dlp
 
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -23,8 +24,8 @@ def download_audio(url: str, out_dir: Path) -> tuple[Path, str | None]:
         "quiet": True,
         "postprocessors": [{
             "key": "FFmpegExtractAudio",
-            "preferredcodec": "wav",
-            "preferredquality": "192",
+            "preferredcodec": "mp3",
+            "preferredquality": "5",
         }],
     }
     if COOKIES_FILE.exists():
@@ -43,7 +44,7 @@ def download_audio(url: str, out_dir: Path) -> tuple[Path, str | None]:
             ) from e
         raise YoutubeDownloadError(f"Failed to download audio: {e}") from e
 
-    wav_path = out_dir / "source.wav"
-    if not wav_path.exists():
+    mp3_path = out_dir / "source.mp3"
+    if not mp3_path.exists():
         raise YoutubeDownloadError("Download succeeded but no audio file was produced.")
-    return wav_path, (info or {}).get("title")
+    return mp3_path, (info or {}).get("title")
