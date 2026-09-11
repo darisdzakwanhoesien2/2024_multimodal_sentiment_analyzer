@@ -86,15 +86,18 @@ th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--bord
 th { color: var(--muted); font-weight: 500; }
 
 .timeline { margin-top: 12px; }
-.timeline-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.timeline-label { width: 90px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
-.timeline-track { position: relative; flex: 1; height: 22px; background: var(--bg); border-radius: 4px; overflow: hidden; }
+/* Label sits above its track (not beside it) so the track itself spans the
+   full row width — the same 100% width as the video/audio player above it.
+   A native <video controls> scrubber has its own browser-chrome padding we
+   can't reach via CSS, so exact alignment isn't achievable against it;
+   matching the player's outer box width instead is the alignment that's
+   actually guaranteed. */
+.timeline-row { margin-bottom: 12px; }
+.timeline-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.timeline-track { position: relative; width: 100%; height: 22px; background: var(--bg); border-radius: 4px; overflow: hidden; }
 .timeline-seg { position: absolute; top: 0; bottom: 0; border-radius: 3px; opacity: 0.85; }
 
-/* Matches .timeline-label's width (90px) + .timeline-row's gap (8px), so the
-   player's own scrubber (0%-100% of its width) lines up with the timeline
-   track below it instead of starting 98px further left. */
-#videoSection video, #audioSection audio { display: block; margin-left: 98px; width: calc(100% - 98px); }
+#videoSection video, #audioSection audio { display: block; width: 100%; }
 
 .transcript-box { white-space: pre-wrap; font-size: 14px; line-height: 1.5; max-height: 320px; overflow-y: auto; }
 
