@@ -24,6 +24,21 @@ def extract_audio_if_video(input_path: str, out_path: str) -> str:
     return out_path
 
 
+def get_media_duration(path: str) -> float | None:
+    """Total duration in seconds via ffprobe, or None if it can't be read.
+    Used to scale the frontend timeline to the real media length rather than
+    the last detected speech segment's end time, which falls short whenever
+    there's trailing silence/non-speech after the last diarized segment."""
+    try:
+        result = subprocess.run(
+            ["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+            capture_output=True, text=True, check=True,
+        )
+        return round(float(result.stdout.strip()), 3)
+    except (subprocess.CalledProcessError, ValueError, FileNotFoundError):
+        return None
+
+
 def load_waveform_for_diarization(audio_path: str):
     """Load, downmix to mono, resample to 16kHz and pad to a whole number of 10s
     chunks. Returns (waveform: torch.Tensor[1, T], sample_rate: int) for pyannote's

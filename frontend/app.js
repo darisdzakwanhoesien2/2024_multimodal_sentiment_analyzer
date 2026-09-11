@@ -228,7 +228,7 @@ async function loadResult(jobId) {
     $("dlAudio").classList.add("hidden");
   }
 
-  renderTimeline(data.segments);
+  renderTimeline(data.segments, data.total_duration);
   renderTable("segmentsTable", data.segments, (r) => [r.start, r.end, r.duration, r.speaker]);
   renderTable("statsTable", data.speaker_stats, (r) => [r.speaker, r.segments, r.total_time, r.avg_segment, r.percentage]);
 
@@ -253,7 +253,7 @@ async function loadResult(jobId) {
   };
 }
 
-function renderTimeline(segments) {
+function renderTimeline(segments, totalDuration) {
   const el = $("timeline");
   el.textContent = "";
   if (!segments.length) return;
@@ -261,7 +261,11 @@ function renderTimeline(segments) {
   const speakers = [...new Set(segments.map((s) => s.speaker))];
   const colors = ["#3b82f6", "#f59e0b", "#10b981", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16"];
   const colorFor = (spk) => colors[speakers.indexOf(spk) % colors.length];
-  const totalEnd = Math.max(...segments.map((s) => s.end));
+  // Prefer the media's real duration (from ffprobe server-side) so the
+  // timeline's full width matches the actual video/audio length. Falling
+  // back to the last segment's end time undershoots whenever there's
+  // trailing silence after the last detected speech segment.
+  const totalEnd = totalDuration || Math.max(...segments.map((s) => s.end));
 
   for (const spk of speakers) {
     const row = document.createElement("div");

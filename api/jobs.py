@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .core.align import align_transcript_with_speakers
 from .core.audio import VIDEO_EXTS as _VIDEO_EXTS
-from .core.audio import extract_audio_if_video
+from .core.audio import extract_audio_if_video, get_media_duration
 from .core.diarization import DiarizationError, load_pipeline, run_diarization, speaker_stats
 from .core.transcription import TranscriptionError, run_transcription
 from .core.youtube import YoutubeDownloadError, download_audio, download_video
@@ -228,6 +228,7 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
         if transcript_text is not None:
             (job_dir / "transcript.txt").write_text(transcript_text)
 
+        media_for_duration = video_path if (video_path and os.path.exists(video_path)) else audio_path
         result = {
             "segments": rows,
             "speaker_stats": speaker_stats(rows),
@@ -239,6 +240,7 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
             "language_probability": language_probability,
             "has_video": bool(video_path and os.path.exists(video_path)),
             "has_audio": bool(not video_path and audio_path and os.path.exists(audio_path)),
+            "total_duration": get_media_duration(media_for_duration) if media_for_duration else None,
         }
         (job_dir / "result.json").write_text(json.dumps(result))
         succeeded = True
@@ -348,6 +350,7 @@ def _rehydrate_job(dir_path: Path) -> dict | None:
             "language_probability": None,
             "has_video": is_video,
             "has_audio": media_path is not None and not is_video,
+            "total_duration": get_media_duration(str(media_path)) if media_path else (rows[-1]["end"] if rows else None),
         }
         return {**base, "status": "done", "progress": "done", "error": None, "result": result}
 
