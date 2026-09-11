@@ -1,3 +1,6 @@
+import os
+import re
+
 from fastapi import APIRouter, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, PlainTextResponse
 
@@ -7,11 +10,13 @@ from ..schemas import JobCreatedResponse, JobStatusResponse
 router = APIRouter(prefix="/api", tags=["diarization"])
 
 ALLOWED_EXTS = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".mp4", ".mkv", ".mov", ".avi"}
+YOUTUBE_URL_RE = re.compile(r"^https?://(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+")
 
 
 @router.post("/jobs", response_model=JobCreatedResponse, status_code=202)
 async def create_job(
-    file: UploadFile,
+    file: UploadFile | None = None,
+    youtube_url: str = Form(""),
     hf_token: str = Form(...),
     model_choice: str = Form("pyannote/speaker-diarization-3.1"),
     num_speakers: int = Form(0),
@@ -23,14 +28,25 @@ async def create_job(
     whisper_compute_type: str = Form("int8"),
     whisper_language: str = Form(""),
 ):
-    import os
-    ext = os.path.splitext(file.filename or "")[1].lower()
-    if ext not in ALLOWED_EXTS:
-        raise HTTPException(400, f"Unsupported file type '{ext}'. Allowed: {sorted(ALLOWED_EXTS)}")
+    youtube_url = youtube_url.strip()
+    has_file = file is not None and file.filename
+    if has_file and youtube_url:
+        raise HTTPException(400, "Provide either a file or a YouTube URL, not both.")
+    if not has_file and not youtube_url:
+        raise HTTPException(400, "Provide either a file or a YouTube URL.")
 
-    file_bytes = await file.read()
-    if not file_bytes:
-        raise HTTPException(400, "Uploaded file is empty.")
+    file_name, file_bytes = None, None
+    if has_file:
+        ext = os.path.splitext(file.filename or "")[1].lower()
+        if ext not in ALLOWED_EXTS:
+            raise HTTPException(400, f"Unsupported file type '{ext}'. Allowed: {sorted(ALLOWED_EXTS)}")
+        file_bytes = await file.read()
+        if not file_bytes:
+            raise HTTPException(400, "Uploaded file is empty.")
+        file_name = file.filename
+    else:
+        if not YOUTUBE_URL_RE.match(youtube_url):
+            raise HTTPException(400, "That doesn't look like a youtube.com or youtu.be video URL.")
 
     params = dict(
         hf_token=hf_token,
@@ -44,7 +60,10 @@ async def create_job(
         whisper_compute_type=whisper_compute_type,
         whisper_language=whisper_language,
     )
-    job_id = jobs.create_job(file.filename, file_bytes, params)
+    job_id = jobs.create_job(
+        params, file_name=file_name, file_bytes=file_bytes,
+        youtube_url=youtube_url or None,
+    )
     return JobCreatedResponse(job_id=job_id, status="queued")
 
 

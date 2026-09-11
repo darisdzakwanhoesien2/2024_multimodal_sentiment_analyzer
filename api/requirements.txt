@@ -4,3 +4,4 @@ python-multipart
 huggingface_hub
 pyannote.audio
 faster-whisper
+yt-dlp

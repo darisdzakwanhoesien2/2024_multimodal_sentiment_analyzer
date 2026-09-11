@@ -40,10 +40,17 @@ let pollTimer = null;
 
 $("runBtn").addEventListener("click", async () => {
   const fileInput = $("fileInput");
+  const youtubeUrl = $("youtubeUrl").value.trim();
   const status = $("runStatus");
 
-  if (!fileInput.files.length) {
-    status.textContent = "Choose a file first.";
+  const hasFile = fileInput.files.length > 0;
+  if (hasFile && youtubeUrl) {
+    status.textContent = "Choose a file OR a YouTube URL, not both.";
+    status.className = "status-line status-error";
+    return;
+  }
+  if (!hasFile && !youtubeUrl) {
+    status.textContent = "Choose a file or paste a YouTube URL.";
     status.className = "status-line status-error";
     return;
   }
@@ -59,7 +66,11 @@ $("runBtn").addEventListener("click", async () => {
   if (pollTimer) clearInterval(pollTimer);
 
   const form = new FormData();
-  form.append("file", fileInput.files[0]);
+  if (hasFile) {
+    form.append("file", fileInput.files[0]);
+  } else {
+    form.append("youtube_url", youtubeUrl);
+  }
   form.append("hf_token", hfToken);
   form.append("model_choice", $("modelChoice").value);
   form.append("num_speakers", $("numSpeakers").value);
