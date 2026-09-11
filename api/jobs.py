@@ -47,6 +47,23 @@ _jobs: dict = {}
 # risks exhausting memory.
 _executor = ThreadPoolExecutor(max_workers=1)
 
+_shutting_down = threading.Event()
+
+
+class ShuttingDownError(RuntimeError):
+    pass
+
+
+def prepare_for_shutdown():
+    """Called from main.py's shutdown handler. Stops accepting new jobs and
+    blocks until whatever is currently running finishes, so a deploy restart
+    doesn't kill a 15-45 minute job mid-run. Requires the systemd unit's
+    TimeoutStopSec to be raised well above its default (~90s) — see
+    video-diarization-api.service — or systemd will SIGKILL before this
+    returns anyway."""
+    _shutting_down.set()
+    _executor.shutdown(wait=True)
+
 
 def _set(job_id: str, **fields):
     with _lock:
@@ -72,6 +89,8 @@ def list_jobs() -> list[dict]:
 
 def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | None = None,
                youtube_url: str | None = None) -> str:
+    if _shutting_down.is_set():
+        raise ShuttingDownError("Server is restarting for a deploy — try again in a minute.")
     if not file_bytes and not youtube_url:
         raise ValueError("Either a file or a youtube_url must be provided.")
     check_disk_space()
@@ -111,6 +130,8 @@ def create_job(params: dict, file_name: str | None = None, file_bytes: bytes | N
 
 
 def create_download_job(youtube_url: str) -> str:
+    if _shutting_down.is_set():
+        raise ShuttingDownError("Server is restarting for a deploy — try again in a minute.")
     check_disk_space()
 
     job_id = uuid.uuid4().hex
@@ -364,7 +385,8 @@ def _rehydrate_job(dir_path: Path) -> dict | None:
             except OSError:
                 pass
     return {**base, "status": "error", "progress": "failed",
-            "error": "Job was interrupted by a server restart.", "result": None}
+            "error": f"Job was interrupted by a server restart before finishing. Please re-submit: {file_name}",
+            "result": None}
 
 
 def _rehydrate_from_disk():

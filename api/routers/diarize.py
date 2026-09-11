@@ -69,6 +69,8 @@ async def create_job(
         )
     except jobs.DiskSpaceError as e:
         raise HTTPException(507, str(e)) from e
+    except jobs.ShuttingDownError as e:
+        raise HTTPException(503, str(e)) from e
     return JobCreatedResponse(job_id=job_id, status="queued")
 
 
@@ -81,6 +83,8 @@ def create_download(youtube_url: str = Form(...)):
         job_id = jobs.create_download_job(youtube_url)
     except jobs.DiskSpaceError as e:
         raise HTTPException(507, str(e)) from e
+    except jobs.ShuttingDownError as e:
+        raise HTTPException(503, str(e)) from e
     return JobCreatedResponse(job_id=job_id, status="queued")
 
 
