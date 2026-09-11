@@ -91,6 +91,11 @@ th { color: var(--muted); font-weight: 500; }
 .timeline-track { position: relative; flex: 1; height: 22px; background: var(--bg); border-radius: 4px; overflow: hidden; }
 .timeline-seg { position: absolute; top: 0; bottom: 0; border-radius: 3px; opacity: 0.85; }
 
+/* Matches .timeline-label's width (90px) + .timeline-row's gap (8px), so the
+   player's own scrubber (0%-100% of its width) lines up with the timeline
+   track below it instead of starting 98px further left. */
+#videoSection video, #audioSection audio { display: block; margin-left: 98px; width: calc(100% - 98px); }
+
 .transcript-box { white-space: pre-wrap; font-size: 14px; line-height: 1.5; max-height: 320px; overflow-y: auto; }
 
 .hidden { display: none !important; }
