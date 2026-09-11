@@ -10,7 +10,9 @@ from ..schemas import JobCreatedResponse, JobStatusResponse, JobSummary
 router = APIRouter(prefix="/api", tags=["diarization"])
 
 ALLOWED_EXTS = {".wav", ".mp3", ".m4a", ".flac", ".ogg", ".mp4", ".mkv", ".mov", ".avi"}
-YOUTUBE_URL_RE = re.compile(r"^https?://(www\.)?(youtube\.com/watch\?v=|youtu\.be/)[\w-]+")
+YOUTUBE_URL_RE = re.compile(
+    r"^https?://(www\.|m\.)?(youtube\.com/(watch\?v=|shorts/|embed/|v/)|youtu\.be/)[\w-]+"
+)
 
 
 @router.post("/jobs", response_model=JobCreatedResponse, status_code=202)
