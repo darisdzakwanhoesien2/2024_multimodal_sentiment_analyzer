@@ -10,7 +10,13 @@ function formatDuration(seconds) {
   return h > 0 ? `${h}:${pad(m)}:${pad(s)}` : `${m}:${pad(s)}`;
 }
 
-$("fetchChannelBtn").addEventListener("click", async () => {
+function formatCacheAge(seconds) {
+  if (seconds < 60) return "just now";
+  if (seconds < 3600) return `${Math.round(seconds / 60)} min ago`;
+  return `${Math.round(seconds / 3600)}h ago`;
+}
+
+async function fetchChannel(forceRefresh) {
   const url = $("channelUrl").value.trim();
   const status = $("channelStatus");
   const results = $("channelResults");
@@ -22,18 +28,24 @@ $("fetchChannelBtn").addEventListener("click", async () => {
   }
 
   results.classList.add("hidden");
-  status.textContent = "Fetching video list…";
+  status.textContent = forceRefresh ? "Refreshing video list…" : "Fetching video list…";
   status.className = "status-line";
   $("fetchChannelBtn").disabled = true;
+  $("refreshChannelBtn").disabled = true;
 
   try {
-    const res = await fetch(`/api/youtube/channel?${new URLSearchParams({ url })}`);
+    const params = { url };
+    if (forceRefresh) params.force_refresh = "true";
+    const res = await fetch(`/api/youtube/channel?${new URLSearchParams(params)}`);
     const data = await res.json();
     if (!res.ok) throw new Error(data.detail || res.statusText);
 
     status.textContent = `✅ Found ${data.videos.length} video(s)`;
     status.className = "status-line status-success";
     $("channelTitle").textContent = data.channel_title;
+    $("channelCacheInfo").textContent = data.cached
+      ? ` (cached, fetched ${formatCacheAge(data.cache_age_seconds)})`
+      : " (just fetched)";
 
     const list = $("channelVideoList");
     list.textContent = "";
@@ -84,8 +96,12 @@ $("fetchChannelBtn").addEventListener("click", async () => {
     status.className = "status-line status-error";
   } finally {
     $("fetchChannelBtn").disabled = false;
+    $("refreshChannelBtn").disabled = false;
   }
-});
+}
+
+$("fetchChannelBtn").addEventListener("click", () => fetchChannel(false));
+$("refreshChannelBtn").addEventListener("click", () => fetchChannel(true));
 
 $("doTranscribe").addEventListener("change", (e) => {
   $("whisperOptions").classList.toggle("hidden", !e.target.checked);

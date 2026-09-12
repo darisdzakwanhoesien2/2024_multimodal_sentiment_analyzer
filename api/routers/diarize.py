@@ -16,15 +16,28 @@ YOUTUBE_URL_RE = re.compile(
 
 
 @router.get("/youtube/channel")
-def list_channel(url: str, limit: int = 50):
-    from ..core.youtube import YoutubeDownloadError, is_channel_url, list_channel_videos
+def list_channel(url: str, limit: int = 50, force_refresh: bool = False):
+    from ..core import db
+    from ..core.youtube import YoutubeDownloadError, is_channel_url, list_channel_videos, normalize_channel_url
 
     if not is_channel_url(url):
         raise HTTPException(400, "That doesn't look like a youtube.com channel URL (e.g. youtube.com/@handle).")
+
+    normalized = normalize_channel_url(url)
+    if not force_refresh:
+        cached = db.get_cached_channel(normalized)
+        if cached is not None:
+            return cached
+
     try:
-        return list_channel_videos(url, limit=min(limit, 100))
+        result = list_channel_videos(url, limit=min(limit, 100))
     except YoutubeDownloadError as e:
         raise HTTPException(502, str(e)) from e
+
+    db.save_channel_cache(result["channel_url"], result["channel_title"], result["videos"])
+    fresh = db.get_cached_channel(result["channel_url"])
+    fresh["cached"] = False  # just fetched live, not served from a pre-existing cache entry
+    return fresh
 
 
 @router.post("/jobs", response_model=JobCreatedResponse, status_code=202)
