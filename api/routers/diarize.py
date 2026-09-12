@@ -24,32 +24,40 @@ def list_channel(url: str, limit: int = 50, force_refresh: bool = False):
         raise HTTPException(400, "That doesn't look like a youtube.com channel URL (e.g. youtube.com/@handle).")
 
     normalized = normalize_channel_url(url)
-    if not force_refresh:
-        cached = db.get_cached_channel(normalized)
-        if cached is not None:
-            return cached
+    existing = db.get_channel(normalized)
+    if existing is not None and not force_refresh and not existing["stale"]:
+        existing["cached"] = True
+        existing["cache_age_seconds"] = existing["age_seconds"]
+        return existing
 
     try:
         result = list_channel_videos(url, limit=min(limit, 100))
     except YoutubeDownloadError as e:
+        if existing is not None:
+            # Couldn't refresh (YouTube/network issue) — serve what's stored
+            # rather than fail outright; it's real data, just possibly stale.
+            existing["cached"] = True
+            existing["cache_age_seconds"] = existing["age_seconds"]
+            return existing
         raise HTTPException(502, str(e)) from e
 
-    db.save_channel_cache(result["channel_url"], result["channel_title"], result["videos"])
-    fresh = db.get_cached_channel(result["channel_url"])
-    fresh["cached"] = False  # just fetched live, not served from a pre-existing cache entry
+    db.save_channel(result["channel_url"], result["channel_title"], result["videos"])
+    fresh = db.get_channel(result["channel_url"])
+    fresh["cached"] = False  # just fetched live, not served from what was already stored
+    fresh["cache_age_seconds"] = 0
     return fresh
 
 
 @router.get("/youtube/channels")
 def list_channel_history():
     from ..core import db
-    return db.list_cached_channels()
+    return db.list_channels()
 
 
 @router.get("/youtube/videos")
 def list_video_history():
     from ..core import db
-    return db.list_all_cached_videos()
+    return db.list_all_videos()
 
 
 @router.post("/jobs", response_model=JobCreatedResponse, status_code=202)
