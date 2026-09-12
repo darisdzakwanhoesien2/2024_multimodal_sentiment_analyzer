@@ -221,10 +221,12 @@ def _process_job(job_id: str, input_path: str | None, job_dir: Path, params: dic
         pipeline = load_pipeline(params["hf_token"], params["model_choice"])
 
         _set(job_id, progress="running diarization")
+        _t0 = time.time()
         rows, rttm_str = run_diarization(
             pipeline, audio_path,
             params["num_speakers"], params["min_speakers"], params["max_speakers"],
         )
+        logger.info("Diarization took %.1fs for job %s (%s)", time.time() - _t0, job_id, params["model_choice"])
 
         transcript_text = None
         transcript_segments = None

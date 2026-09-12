@@ -1,6 +1,20 @@
+import os
+
 from .audio import load_waveform_for_diarization
 
 _pipeline_cache: dict = {}
+
+# pyannote defaults to embedding_batch_size=1 / segmentation_batch_size=1 —
+# processing one chunk at a time through the neural nets with no batching.
+# Raising this is a pure efficiency win (fewer, larger forward passes;
+# better use of vectorized CPU math), not an accuracy trade-off — batching
+# doesn't change what's computed, only how many chunks go through per call.
+_BATCH_SIZE = 32
+
+
+def _configure_torch_threads():
+    import torch
+    torch.set_num_threads(os.cpu_count() or 1)
 
 
 class DiarizationError(RuntimeError):
@@ -13,6 +27,8 @@ def load_pipeline(token: str, repo_id: str):
 
     if repo_id in _pipeline_cache:
         return _pipeline_cache[repo_id]
+
+    _configure_torch_threads()
 
     from pyannote.audio import Pipeline
 
@@ -34,6 +50,12 @@ def load_pipeline(token: str, repo_id: str):
         if "404" in err:
             raise DiarizationError(f"Model `{repo_id}` not found (404).") from e
         raise DiarizationError(f"Failed to load `{repo_id}`: {e}") from e
+
+    try:
+        pipeline.embedding_batch_size = _BATCH_SIZE
+        pipeline.segmentation_batch_size = _BATCH_SIZE
+    except AttributeError:
+        pass  # older/different pipeline variant without these knobs — harmless to skip
 
     _pipeline_cache[repo_id] = pipeline
     return pipeline
