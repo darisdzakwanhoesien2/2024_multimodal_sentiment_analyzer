@@ -20,7 +20,8 @@
 
     <div class="panel">
       <label for="channelUrl">Browse a YouTube channel</label>
-      <input type="text" id="channelUrl" placeholder="https://www.youtube.com/@handle">
+      <input type="text" id="channelUrl" placeholder="https://www.youtube.com/@handle" list="channelUrlHistory">
+      <datalist id="channelUrlHistory"></datalist>
       <button type="button" class="secondary" id="fetchChannelBtn">Fetch videos</button>
       <div id="channelStatus" class="status-line"></div>
       <div id="channelResults" class="hidden">
@@ -29,6 +30,13 @@
         <button type="button" class="secondary" id="refreshChannelBtn" style="margin-left:8px; padding:2px 10px; margin-top:0;">↻ Refresh</button>
         <div id="channelVideoList" class="channel-video-list"></div>
       </div>
+    </div>
+
+    <div class="panel">
+      <label for="videoHistoryFilter">Previously found videos</label>
+      <input type="text" id="videoHistoryFilter" placeholder="Filter by title or channel…">
+      <div id="videoHistoryStatus" class="small" style="margin-top:8px;"></div>
+      <div id="videoHistoryList" class="channel-video-list"></div>
     </div>
 
     <div class="panel">
@@ -149,6 +157,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=11"></script>
+  <script src="app.js?v=12"></script>
 </body>
 </html>

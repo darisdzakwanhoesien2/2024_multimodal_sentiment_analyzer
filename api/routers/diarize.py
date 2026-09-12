@@ -40,6 +40,18 @@ def list_channel(url: str, limit: int = 50, force_refresh: bool = False):
     return fresh
 
 
+@router.get("/youtube/channels")
+def list_channel_history():
+    from ..core import db
+    return db.list_cached_channels()
+
+
+@router.get("/youtube/videos")
+def list_video_history():
+    from ..core import db
+    return db.list_all_cached_videos()
+
+
 @router.post("/jobs", response_model=JobCreatedResponse, status_code=202)
 async def create_job(
     file: UploadFile | None = None,

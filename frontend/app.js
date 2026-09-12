@@ -16,6 +16,98 @@ function formatCacheAge(seconds) {
   return `${Math.round(seconds / 3600)}h ago`;
 }
 
+function createVideoItem(video, { showChannel } = {}) {
+  const item = document.createElement("div");
+  item.className = "channel-video-item";
+
+  if (video.thumbnail) {
+    const img = document.createElement("img");
+    img.src = video.thumbnail;
+    img.alt = "";
+    item.appendChild(img);
+  }
+
+  const info = document.createElement("div");
+  info.className = "cv-info";
+  const title = document.createElement("div");
+  title.className = "cv-title";
+  title.textContent = video.title;
+  title.title = video.title;
+  const meta = document.createElement("div");
+  meta.className = "cv-meta";
+  meta.textContent = [
+    showChannel ? video.channel_title : null,
+    formatDuration(video.duration),
+    video.view_count != null ? `${video.view_count.toLocaleString()} views` : null,
+  ].filter(Boolean).join(" · ");
+  info.appendChild(title);
+  info.appendChild(meta);
+  item.appendChild(info);
+
+  const selectBtn = document.createElement("button");
+  selectBtn.type = "button";
+  selectBtn.className = "secondary";
+  selectBtn.textContent = "Select";
+  selectBtn.onclick = () => {
+    $("youtubeUrl").value = video.url;
+    $("fileInput").value = "";
+    $("youtubeUrl").scrollIntoView({ behavior: "smooth", block: "center" });
+    $("youtubeUrl").focus();
+  };
+  item.appendChild(selectBtn);
+
+  return item;
+}
+
+async function loadChannelUrlHistory() {
+  const res = await fetch("/api/youtube/channels");
+  if (!res.ok) return;
+  const channels = await res.json();
+  const datalist = $("channelUrlHistory");
+  datalist.textContent = "";
+  for (const c of channels) {
+    const option = document.createElement("option");
+    option.value = c.channel_url;
+    option.label = c.channel_title;
+    datalist.appendChild(option);
+  }
+}
+
+let allVideoHistory = [];
+
+async function loadVideoHistory() {
+  const status = $("videoHistoryStatus");
+  try {
+    const res = await fetch("/api/youtube/videos");
+    allVideoHistory = res.ok ? await res.json() : [];
+    renderVideoHistory();
+  } catch (e) {
+    status.textContent = "Couldn't load video history.";
+  }
+}
+
+function renderVideoHistory() {
+  const filterText = $("videoHistoryFilter").value.trim().toLowerCase();
+  const status = $("videoHistoryStatus");
+  const list = $("videoHistoryList");
+
+  const filtered = filterText
+    ? allVideoHistory.filter((v) =>
+        v.title.toLowerCase().includes(filterText) || v.channel_title.toLowerCase().includes(filterText))
+    : allVideoHistory;
+
+  status.textContent = allVideoHistory.length === 0
+    ? "No videos fetched yet — browse a channel above first."
+    : `${filtered.length} of ${allVideoHistory.length} video(s)`;
+
+  list.textContent = "";
+  for (const video of filtered) {
+    list.appendChild(createVideoItem(video, { showChannel: true }));
+  }
+}
+
+$("videoHistoryFilter").addEventListener("input", renderVideoHistory);
+
 async function fetchChannel(forceRefresh) {
   const url = $("channelUrl").value.trim();
   const status = $("channelStatus");
@@ -50,47 +142,11 @@ async function fetchChannel(forceRefresh) {
     const list = $("channelVideoList");
     list.textContent = "";
     for (const video of data.videos) {
-      const item = document.createElement("div");
-      item.className = "channel-video-item";
-
-      if (video.thumbnail) {
-        const img = document.createElement("img");
-        img.src = video.thumbnail;
-        img.alt = "";
-        item.appendChild(img);
-      }
-
-      const info = document.createElement("div");
-      info.className = "cv-info";
-      const title = document.createElement("div");
-      title.className = "cv-title";
-      title.textContent = video.title;
-      title.title = video.title;
-      const meta = document.createElement("div");
-      meta.className = "cv-meta";
-      meta.textContent = [
-        formatDuration(video.duration),
-        video.view_count != null ? `${video.view_count.toLocaleString()} views` : null,
-      ].filter(Boolean).join(" · ");
-      info.appendChild(title);
-      info.appendChild(meta);
-      item.appendChild(info);
-
-      const selectBtn = document.createElement("button");
-      selectBtn.type = "button";
-      selectBtn.className = "secondary";
-      selectBtn.textContent = "Select";
-      selectBtn.onclick = () => {
-        $("youtubeUrl").value = video.url;
-        $("fileInput").value = "";
-        $("youtubeUrl").scrollIntoView({ behavior: "smooth", block: "center" });
-        $("youtubeUrl").focus();
-      };
-      item.appendChild(selectBtn);
-
-      list.appendChild(item);
+      list.appendChild(createVideoItem(video));
     }
     results.classList.remove("hidden");
+    loadChannelUrlHistory();
+    loadVideoHistory();
   } catch (e) {
     status.textContent = `Failed to fetch channel: ${e.message}`;
     status.className = "status-line status-error";
@@ -530,3 +586,5 @@ async function checkCookiesHealth() {
 loadJobFromQueryParam();
 loadHistory();
 checkCookiesHealth();
+loadChannelUrlHistory();
+loadVideoHistory();

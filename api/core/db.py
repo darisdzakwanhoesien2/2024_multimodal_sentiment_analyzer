@@ -59,6 +59,32 @@ def get_cached_channel(channel_url: str, max_age: float = CACHE_TTL_SECONDS) -> 
     }
 
 
+def list_cached_channels() -> list[dict]:
+    """Every channel ever fetched (regardless of TTL) — used to populate a
+    history dropdown/datalist so a previously-browsed channel can be
+    re-selected without retyping its URL."""
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT channel_url, channel_title, fetched_at FROM channel_cache ORDER BY fetched_at DESC"
+        ).fetchall()
+    return [{"channel_url": r[0], "channel_title": r[1], "fetched_at": r[2]} for r in rows]
+
+
+def list_all_cached_videos() -> list[dict]:
+    """Every video from every cached channel, flattened into one list (each
+    tagged with its channel_title) — lets a video be picked without
+    re-fetching the channel it came from."""
+    with _connect() as conn:
+        rows = conn.execute(
+            "SELECT channel_title, videos_json FROM channel_cache ORDER BY fetched_at DESC"
+        ).fetchall()
+    videos = []
+    for channel_title, videos_json in rows:
+        for v in json.loads(videos_json):
+            videos.append({**v, "channel_title": channel_title})
+    return videos
+
+
 def save_channel_cache(channel_url: str, channel_title: str, videos: list[dict]):
     with _connect() as conn:
         conn.execute(
