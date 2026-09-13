@@ -12,6 +12,37 @@ class YoutubeDownloadError(RuntimeError):
     pass
 
 
+def validate_cookies_file(content: bytes) -> str | None:
+    """Returns an error message if content doesn't look like a Netscape-format
+    cookies.txt with YouTube entries, else None."""
+    try:
+        text = content.decode("utf-8", errors="replace")
+    except Exception:
+        return "File isn't valid text."
+    if not text.strip():
+        return "File is empty."
+    if "youtube.com" not in text:
+        return "This doesn't look like a YouTube cookies file (no youtube.com entries found)."
+    data_lines = [line for line in text.splitlines() if line.strip() and not line.startswith("#")]
+    if not data_lines:
+        return "No cookie entries found in the file."
+    if not all(len(line.split("\t")) == 7 for line in data_lines[:5]):
+        return "This doesn't look like a Netscape-format cookies.txt (expected tab-separated fields)."
+    return None
+
+
+def save_cookies_file(content: bytes):
+    """Atomic write (temp file + rename) so a job mid-read of the old cookies
+    file (yt-dlp reads it fully when it starts) never sees a half-written
+    file, regardless of exactly when this lands relative to that read."""
+    import os
+
+    COOKIES_FILE.parent.mkdir(parents=True, exist_ok=True)
+    tmp_path = COOKIES_FILE.with_suffix(".txt.tmp")
+    tmp_path.write_bytes(content)
+    os.replace(tmp_path, COOKIES_FILE)
+
+
 def _base_ydl_opts() -> dict:
     opts = {
         "noplaylist": True,

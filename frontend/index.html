@@ -46,6 +46,11 @@
       <label for="youtubeUrl">…or a YouTube URL</label>
       <input type="text" id="youtubeUrl" placeholder="https://www.youtube.com/watch?v=...">
       <div id="cookiesHealthLine" class="status-line hidden"></div>
+      <div style="margin-top:8px;">
+        <input type="file" id="cookiesFileInput" accept=".txt">
+        <button type="button" class="secondary" id="uploadCookiesBtn">Upload youtube_cookies.txt</button>
+      </div>
+      <p class="small">Uploading works even while a job is running — it doesn't share the job queue, and only affects jobs started after the upload.</p>
       <p class="small">
         Provide a file <em>or</em> a URL, not both. Running diarization only downloads audio.
         <button type="button" class="secondary" id="downloadVideoBtn" style="margin:8px 0 0;">⬇ Just download the video (no processing)</button>
@@ -157,6 +162,6 @@
     </div>
   </div>
 
-  <script src="app.js?v=12"></script>
+  <script src="app.js?v=13"></script>
 </body>
 </html>

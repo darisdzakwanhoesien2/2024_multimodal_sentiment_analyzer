@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Form
+from fastapi import APIRouter, Form, HTTPException, UploadFile
 
 from ..schemas import HealthResponse
 
@@ -41,6 +41,25 @@ def health():
 @router.get("/youtube/health")
 def youtube_health():
     from ..core.youtube import check_cookies_health
+    return check_cookies_health()
+
+
+@router.post("/youtube/cookies")
+def upload_cookies(file: UploadFile):
+    # A plain (non-async) handler: FastAPI runs these in Starlette's own
+    # thread pool, entirely separate from jobs.py's single-worker executor
+    # that serializes diarization/download jobs. Uploading fresh cookies is
+    # never blocked by (and never blocks) a job that's currently running —
+    # it just won't retroactively affect a job already mid-download, since
+    # that job already read the old file when it started.
+    from ..core.youtube import check_cookies_health, save_cookies_file, validate_cookies_file
+
+    content = file.file.read()
+    error = validate_cookies_file(content)
+    if error:
+        raise HTTPException(400, error)
+
+    save_cookies_file(content)
     return check_cookies_health()
 
 

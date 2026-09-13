@@ -565,23 +565,58 @@ async function loadJobFromQueryParam() {
   }
 }
 
-async function checkCookiesHealth() {
+function renderCookiesHealth(data) {
   const line = $("cookiesHealthLine");
+  line.classList.remove("hidden");
+  if (data.ok) {
+    line.textContent = "✅ YouTube cookies OK";
+    line.className = "status-line status-success";
+  } else {
+    line.textContent = `⚠️ ${data.detail}`;
+    line.className = "status-line status-error";
+  }
+}
+
+async function checkCookiesHealth() {
   try {
     const res = await fetch("/api/youtube/health");
-    const data = await res.json();
-    line.classList.remove("hidden");
-    if (data.ok) {
-      line.textContent = "✅ YouTube cookies OK";
-      line.className = "status-line status-success";
-    } else {
-      line.textContent = `⚠️ ${data.detail}`;
-      line.className = "status-line status-error";
-    }
+    renderCookiesHealth(await res.json());
   } catch (e) {
     // Non-critical — just skip showing the banner if the check itself fails.
   }
 }
+
+$("uploadCookiesBtn").addEventListener("click", async () => {
+  const fileInput = $("cookiesFileInput");
+  const line = $("cookiesHealthLine");
+
+  if (!fileInput.files.length) {
+    line.classList.remove("hidden");
+    line.textContent = "Choose a cookies.txt file first.";
+    line.className = "status-line status-error";
+    return;
+  }
+
+  $("uploadCookiesBtn").disabled = true;
+  line.classList.remove("hidden");
+  line.textContent = "Uploading and verifying…";
+  line.className = "status-line";
+
+  try {
+    const form = new FormData();
+    form.append("file", fileInput.files[0]);
+    const res = await fetch("/api/youtube/cookies", { method: "POST", body: form });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || res.statusText);
+    renderCookiesHealth(data);
+    fileInput.value = "";
+  } catch (e) {
+    line.textContent = `Upload failed: ${e.message}`;
+    line.className = "status-line status-error";
+  } finally {
+    $("uploadCookiesBtn").disabled = false;
+  }
+});
 
 loadJobFromQueryParam();
 loadHistory();
